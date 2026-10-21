@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#070b0f">
+  <meta name="description" content="Watch live chess at Gambit — streams, broadcasts and the biggest tournaments in the world.">
+  <title>Watch Chess — Gambit</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='24' fill='%2322c55e'/%3E%3Ctext x='50' y='78' font-size='70' text-anchor='middle'%3E%E2%99%9E%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="assets/css/base.css?v=20261021b">
+  <link rel="stylesheet" href="assets/css/pages.css?v=20261021b">
+</head>
+<body data-page="watch">
+  <div id="site-header"></div>
+
+  <main class="container">
+    <div class="page-head">
+      <div>
+        <span class="eyebrow">Live from the board</span>
+        <h1>Watch the game unfold.</h1>
+        <p>Streams, broadcasts and the world's best players — with live clocks, engine-free commentary and a chat that actually behaves.</p>
+      </div>
+      <div class="row gap-8">
+        <button class="btn" id="notify-live"><span data-icon="bell"></span> Notify me</button>
+        <button class="btn btn-primary" id="go-live"><span data-icon="tv"></span> Go live</button>
+      </div>
+    </div>
+
+    <section class="watch-hero">
+      <div class="card watch-board-card">
+        <div class="match-head">
+          <span class="badge badge-live"><span class="live-dot"></span> Featured broadcast</span>
+          <span class="row gap-6 small muted"><span data-icon="eye"></span> 42.1k watching</span>
+        </div>
+        <div class="player-bar">
+          <span class="avatar tone-3">MC</span>
+          <div class="player-copy"><div class="player-name">Magnus C. <span class="badge badge-gold">GM</span></div><div class="player-sub">White · 2839</div></div>
+          <div class="clock active" id="watch-clock-top">14:22</div>
+        </div>
+        <div id="watch-board"></div>
+        <div class="player-bar">
+          <span class="avatar tone-6">GD</span>
+          <div class="player-copy"><div class="player-name">Gukesh D. <span class="badge badge-green">GM</span></div><div class="player-sub">Black · 2783</div></div>
+          <div class="clock" id="watch-clock-bottom">14:19</div>
+        </div>
+        <div class="match-foot">
+          <span class="row gap-6"><span data-icon="tv"></span> Global Chess League · Game 4</span>
+          <span class="row gap-6" style="color:var(--brand)"><span class="live-dot"></span> Move <b id="watch-move-number">21</b></span>
+        </div>
+      </div>
+
+      <div class="card broadcast-info">
+        <div class="row gap-6"><span class="badge badge-live"><span class="live-dot"></span> Live</span><span class="badge">Classical</span><span class="badge badge-gold">Game 4 of 6</span></div>
+        <div>
+          <h2>Alpine Kings vs.<br>Coastal Sharks</h2>
+          <p>Global Chess League finals. Two heavyweight boards, one very tense match score — and the clock is starting to matter.</p>
+        </div>
+        <div class="broadcast-players">
+          <div class="bp"><span class="avatar tone-3">MC</span><div><b>Magnus C.</b><span>Alpine Kings · 2839</span></div></div>
+          <span class="bp-vs">vs</span>
+          <div class="bp"><span class="avatar tone-6">GD</span><div><b>Gukesh D.</b><span>Coastal Sharks · 2783</span></div></div>
+        </div>
+        <div class="row gap-8">
+          <button class="btn btn-primary" id="watch-featured"><span data-icon="play"></span> Watch broadcast</button>
+          <button class="btn" id="follow-broadcast"><span data-icon="heart"></span> Follow</button>
+          <button class="btn btn-ghost" id="broadcast-share"><span data-icon="share"></span></button>
+        </div>
+        <div class="row gap-16 tiny muted" style="margin-top:2px">
+          <span class="row gap-6"><span class="live-dot"></span> 42,118 watching</span>
+          <span>⏱ 2h 14m</span>
+          <span>♟ 34 moves</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" style="padding-top:12px">
+      <div class="watch-tabs">
+        <div class="seg-line" id="watch-tabs">
+          <button class="active" data-watch-tab="streams">Live streams <span class="badge badge-live" style="margin-left:5px"><span class="live-dot"></span> 8</span></button>
+          <button data-watch-tab="broadcasts">Broadcasts</button>
+          <button data-watch-tab="schedule">Schedule</button>
+        </div>
+      </div>
+
+      <div class="tab-pane active" data-watch-pane="streams">
+        <div class="tabs-filters">
+          <div class="filter-row" id="stream-filters">
+            <button class="chip active" data-stream-cat="All">All streams</button>
+            <button class="chip" data-stream-cat="Blitz">Blitz</button>
+            <button class="chip" data-stream-cat="Rapid">Rapid</button>
+            <button class="chip" data-stream-cat="Puzzles">Puzzles</button>
+            <button class="chip" data-stream-cat="Study">Study</button>
+            <button class="chip" data-stream-cat="Endgames">Endgames</button>
+          </div>
+          <span class="tiny muted"><span class="live-dot" style="display:inline-block;margin-right:5px"></span> 118,400 watching chess right now</span>
+        </div>
+        <div class="stream-grid" id="stream-grid"></div>
+      </div>
+
+      <div class="tab-pane" data-watch-pane="broadcasts">
+        <div class="card" style="overflow:hidden">
+          <table class="broadcast-table">
+            <thead><tr><th>Tournament</th><th>Round</th><th>Matchup</th><th>Viewers</th><th></th></tr></thead>
+            <tbody id="broadcast-list"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="tab-pane" data-watch-pane="schedule">
+        <div class="schedule-grid" id="schedule-grid"></div>
+      </div>
+    </section>
+
+    <section class="section" style="padding-top:0">
+      <div class="section-head">
+        <div><h2>Stay for the analysis</h2><p>VODs and recaps from your favourite streamers.</p></div>
+        <button class="btn btn-sm" id="browse-vods">Browse the library <span data-icon="arrowRight"></span></button>
+      </div>
+      <div class="stream-grid" id="vod-grid"></div>
+    </section>
+
+    <section class="section" style="padding-top:0">
+      <div class="card watch-cta">
+        <span class="stat-ic"><span data-icon="bell"></span></span>
+        <div class="grow"><h4>Never miss a stream</h4><p>Follow your favourite players and get a quiet nudge when they go live.</p></div>
+        <button class="btn btn-sm" id="manage-alerts">Manage alerts</button>
+      </div>
+    </section>
+  </main>
+
+  <div id="site-footer"></div>
+
+  <script src="assets/js/data.js?v=20261021b"></script>
+  <script src="assets/js/engine.js?v=20261021b"></script>
+  <script src="assets/js/app.js?v=20261021b"></script>
+  <script src="assets/js/board.js?v=20261021b"></script>
+  <script src="assets/js/watch.js?v=20261021b"></script>
+</body>
+</html>

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#070b0f">
+  <meta name="description" content="Gambit tournaments — arenas, Swiss events and team battles for every level.">
+  <title>Tournaments — Gambit</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='24' fill='%2322c55e'/%3E%3Ctext x='50' y='78' font-size='70' text-anchor='middle'%3E%E2%99%9E%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="assets/css/base.css?v=20261021b">
+  <link rel="stylesheet" href="assets/css/pages.css?v=20261021b">
+</head>
+<body data-page="tournaments">
+  <div id="site-header"></div>
+
+  <main class="container">
+    <div class="page-head">
+      <div>
+        <span class="eyebrow">Compete</span>
+        <h1>The clock is running.</h1>
+        <p>Arenas, Swiss events and team battles. Find your level, enter the queue, and play for the love of the game.</p>
+      </div>
+      <div class="row gap-8">
+        <button class="btn" id="my-tournaments"><span data-icon="calendar"></span> My tournaments</button>
+        <button class="btn btn-primary" id="create-tournament"><span data-icon="plus"></span> Create tournament</button>
+      </div>
+    </div>
+
+    <section class="arena-hero">
+      <div class="card arena-main">
+        <span class="arena-crown">♛</span>
+        <div class="row gap-8" style="margin-bottom:10px">
+          <span class="badge badge-live"><span class="live-dot"></span> Featured arena</span>
+          <span class="badge">Free entry</span>
+        </div>
+        <h2>Sunset Blitz Arena</h2>
+        <p>One hour of 3+2 chaos. Win streaks earn bonus points, so keep playing while the sun goes down. All ratings welcome.</p>
+        <div class="row gap-6" style="margin-top:12px;flex-wrap:wrap">
+          <span class="badge">3+2 blitz</span>
+          <span class="badge">1,842 playing</span>
+          <span class="badge badge-gold">500 rating points</span>
+        </div>
+        <div class="arena-cd" aria-label="Countdown to tournament">
+          <div class="cd-box"><b id="cd-d">00</b><span>Days</span></div>
+          <div class="cd-box"><b id="cd-h">00</b><span>Hours</span></div>
+          <div class="cd-box"><b id="cd-m">00</b><span>Mins</span></div>
+          <div class="cd-box"><b id="cd-s">00</b><span>Secs</span></div>
+        </div>
+        <div class="row gap-8" style="flex-wrap:wrap">
+          <button class="btn btn-primary" id="featured-join"><span data-icon="sword"></span> Join the arena</button>
+          <button class="btn" id="featured-details"><span data-icon="info"></span> Event details</button>
+        </div>
+      </div>
+
+      <div class="arena-side">
+        <div class="card arena-side-card">
+          <h4><span data-icon="calendar"></span> Your next event</h4>
+          <div class="row"><span>Midnight Rapid</span><b>Tonight, 23:30</b></div>
+          <div class="row"><span>Format</span><b>10+5 Swiss</b></div>
+          <div class="row"><span>Entry</span><b style="color:var(--brand)">Registered</b></div>
+          <button class="btn btn-sm btn-outline btn-block mt-12" id="view-my-events">View my events <span data-icon="arrowRight"></span></button>
+        </div>
+        <div class="card arena-side-card" style="padding-bottom:8px">
+          <h4><span class="live-dot"></span> Current standings</h4>
+          <div class="mini-leader" id="featured-standings"></div>
+        </div>
+      </div>
+    </section>
+
+    <div class="tournaments-layout">
+      <div>
+        <div class="tabs-filters">
+          <div class="tabs" id="tourney-tabs" role="tablist" style="max-width:430px">
+            <button class="active" data-tourney-filter="All">All events</button>
+            <button data-tourney-filter="Arena">Arena</button>
+            <button data-tourney-filter="Swiss">Swiss</button>
+            <button data-tourney-filter="Team">Team</button>
+          </div>
+          <span class="tiny muted" id="tourney-count">8 events this week</span>
+        </div>
+        <div class="tournament-grid" id="tournament-grid"></div>
+
+        <section class="card" style="overflow:hidden;margin-top:20px">
+          <div class="widget-head" style="padding:16px 18px 11px">
+            <h3 style="font-size:14px"><span data-icon="calendar"></span> This week's schedule</h3>
+            <button class="btn btn-sm btn-ghost" id="calendar-export"><span data-icon="calendar"></span> Add to calendar</button>
+          </div>
+          <div class="tourney-list" id="schedule-list"></div>
+        </section>
+      </div>
+
+      <aside class="tourney-side">
+        <div class="card">
+          <div class="widget-head"><h3 style="font-size:13px"><span data-icon="check"></span> You're registered</h3><span class="count" id="registered-count">1</span></div>
+          <div class="tourney-list" id="user-events"></div>
+          <div class="widget-foot"><button class="btn btn-sm btn-outline btn-block" id="browse-events">Find another event <span data-icon="arrowRight"></span></button></div>
+        </div>
+
+        <div class="card">
+          <div class="widget-head"><h3 style="font-size:13px"><span data-icon="help"></span> How it works</h3></div>
+          <div class="widget-body">
+            <ul class="rule-list">
+              <li><span class="num">1</span><span><b>Join and queue.</b> Pairings are automatic — play as many games as you can in the window.</span></li>
+              <li><span class="num">2</span><span><b>Win streaks matter.</b> In arenas, two wins in a row earn double points. Keep the run alive.</span></li>
+              <li><span class="num">3</span><span><b>Fair play first.</b> No engine help, no sandbagging. Ratings are adjusted after each event.</span></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="widget-head"><h3 style="font-size:13px"><span data-icon="trophy"></span> Top finishers</h3><a class="link-more" href="community.html">All <span data-icon="arrowRight"></span></a></div>
+          <div class="mini-leader" id="top-finishers"></div>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <div id="site-footer"></div>
+
+  <script src="assets/js/data.js?v=20261021b"></script>
+  <script src="assets/js/engine.js?v=20261021b"></script>
+  <script src="assets/js/app.js?v=20261021b"></script>
+  <script src="assets/js/board.js?v=20261021b"></script>
+  <script src="assets/js/tournaments.js?v=20261021b"></script>
+</body>
+</html>

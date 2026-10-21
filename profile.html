@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#070b0f">
+  <meta name="description" content="Your Gambit profile — ratings, games, achievements and the story so far.">
+  <title>Your Profile — Gambit</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='24' fill='%2322c55e'/%3E%3Ctext x='50' y='78' font-size='70' text-anchor='middle'%3E%E2%99%9E%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="assets/css/base.css?v=20261021b">
+  <link rel="stylesheet" href="assets/css/pages.css?v=20261021b">
+</head>
+<body data-page="profile">
+  <div id="site-header"></div>
+
+  <main class="container" style="padding-top:24px">
+    <section class="profile-hero">
+      <div class="profile-banner"><span class="pattern"></span></div>
+      <div class="profile-body">
+        <div class="profile-head">
+          <span class="avatar profile-avatar" id="profile-avatar">AM</span>
+          <div class="profile-id">
+            <h1 id="profile-name">Alex Morgan <span class="badge badge-green" style="height:19px">Online</span></h1>
+            <span class="handle" id="profile-handle">@alexm · United Kingdom 🇬🇧 · Joined March 2021</span>
+            <div class="row"><span class="badge" id="profile-plan">Gambit Plus</span><span class="badge badge-gold">Team player</span><span class="badge">Fair play verified</span></div>
+          </div>
+          <div class="profile-actions">
+            <button class="btn btn-primary" id="edit-profile"><span data-icon="settings"></span> Edit profile</button>
+            <button class="btn" data-action="friends"><span data-icon="sword"></span> Challenge</button>
+            <button class="btn btn-ghost" id="share-profile" aria-label="Share profile"><span data-icon="share"></span></button>
+          </div>
+        </div>
+
+        <p class="small muted" id="profile-bio" style="max-width:620px;margin:14px 0 0;line-height:1.65">Club player, opening nerd, and serial blitz addict. Trying to break 1900 before summer.</p>
+
+        <div class="profile-stats">
+          <div class="card pstat"><span>Rapid</span><b id="stat-rapid">1,842</b><span class="delta">+18 this month</span></div>
+          <div class="card pstat"><span>Blitz</span><b id="stat-blitz">1,716</b><span class="delta">+9 this month</span></div>
+          <div class="card pstat"><span>Bullet</span><b id="stat-bullet">1,604</b><span class="delta" style="color:var(--muted)">Peak 1,612</span></div>
+          <div class="card pstat"><span>Puzzles</span><b id="stat-puzzles">2,108</b><span class="delta">+64 this week</span></div>
+        </div>
+      </div>
+    </section>
+
+    <div class="profile-grid">
+      <div class="profile-main">
+        <section class="card">
+          <div class="chart-head">
+            <div><h3>Rating graph</h3><span class="tiny muted">Rapid · last 12 weeks</span></div>
+            <div class="tabs" style="max-width:230px">
+              <button data-chart-range="30">30d</button>
+              <button class="active" data-chart-range="90">90d</button>
+              <button data-chart-range="365">1y</button>
+            </div>
+          </div>
+          <div class="rating-chart" id="rating-chart"></div>
+          <div class="chart-legend"><span><i style="background:var(--brand)"></i> Rapid</span><span><i style="background:var(--accent)"></i> Blitz</span><span class="row gap-4" style="margin-left:auto"><span data-icon="trend"></span> +38 rating this quarter</span></div>
+        </section>
+
+        <section class="card" style="overflow:hidden">
+          <div class="widget-head" style="padding:16px 18px 11px">
+            <h3 style="font-size:14px">Recent games</h3>
+            <div class="row gap-8"><span class="tiny muted" id="games-summary">6 games · 3 wins</span><a class="link-more" href="play.html">Play <span data-icon="arrowRight"></span></a></div>
+          </div>
+          <div class="table-scroll">
+            <table class="game-table">
+              <thead><tr><th>Result</th><th>Opponent</th><th>Opening</th><th>Time</th><th>Moves</th><th>Accuracy</th><th>Rating</th></tr></thead>
+              <tbody id="game-history"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="card" style="overflow:hidden">
+          <div class="widget-head" style="padding:16px 18px 11px"><h3 style="font-size:14px">Performance</h3><span class="badge badge-green">Last 30 days</span></div>
+          <div class="performance-grid" id="performance-grid"></div>
+        </section>
+      </div>
+
+      <aside class="profile-side">
+        <div class="card">
+          <div class="widget-head"><h3><span data-icon="award"></span> Achievements</h3><span class="count">5 / 6</span></div>
+          <div class="achievements" id="achievements"></div>
+        </div>
+
+        <div class="card" style="overflow:hidden">
+          <div class="widget-head"><h3 style="font-size:13px">About</h3><button class="btn btn-sm btn-ghost" id="edit-about">Edit</button></div>
+          <div class="profile-info-row"><span>Country</span><b id="info-country">United Kingdom 🇬🇧</b></div>
+          <div class="profile-info-row"><span>Joined</span><b>March 2021</b></div>
+          <div class="profile-info-row"><span>Games played</span><b>2,384</b></div>
+          <div class="profile-info-row"><span>Win rate</span><b style="color:var(--brand)">52.3%</b></div>
+          <div class="profile-info-row"><span>Favourite opening</span><b>Italian Game</b></div>
+          <div class="profile-info-row" style="padding-bottom:14px"><span>Playing style</span><b>Attacking</b></div>
+        </div>
+
+        <div class="card">
+          <div class="widget-head"><h3><span data-icon="users"></span> Friends</h3><a class="link-more" href="community.html">All <span data-icon="arrowRight"></span></a></div>
+          <div class="widget-body friend-online-list" id="profile-friends"></div>
+        </div>
+
+        <div class="card club-cta">
+          <span class="emblem">⚔️</span>
+          <h4>Tactics Anonymous</h4>
+          <p>Member since 2023 · 42.7k players</p>
+          <a class="btn btn-sm btn-outline" href="community.html">Open club</a>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <div id="site-footer"></div>
+
+  <script src="assets/js/data.js?v=20261021b"></script>
+  <script src="assets/js/engine.js?v=20261021b"></script>
+  <script src="assets/js/app.js?v=20261021b"></script>
+  <script src="assets/js/board.js?v=20261021b"></script>
+  <script src="assets/js/profile.js?v=20261021b"></script>
+</body>
+</html>

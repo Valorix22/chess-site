@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#070b0f">
+  <meta name="description" content="The Gambit community — friends, clubs, forums and leaderboards for people who love chess.">
+  <title>Community — Gambit</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='24' fill='%2322c55e'/%3E%3Ctext x='50' y='78' font-size='70' text-anchor='middle'%3E%E2%99%9E%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="assets/css/base.css?v=20261021b">
+  <link rel="stylesheet" href="assets/css/pages.css?v=20261021b">
+</head>
+<body data-page="community">
+  <div id="site-header"></div>
+
+  <main class="container">
+    <div class="page-head">
+      <div>
+        <span class="eyebrow">The clubhouse</span>
+        <h1>Find your people.</h1>
+        <p>Good games are better with good company. Meet players, join a club, argue about openings — kindly.</p>
+      </div>
+      <div class="row gap-8">
+        <button class="btn" data-community-action="invite"><span data-icon="userPlus"></span> Invite a friend</button>
+        <button class="btn btn-primary" data-community-action="add-friend"><span data-icon="search"></span> Find players</button>
+      </div>
+    </div>
+
+    <div class="community-layout">
+      <div class="community-main">
+        <div class="tabs community-tabs" id="community-tabs" role="tablist" style="margin-bottom:16px">
+          <button class="active" data-community-tab="friends"><span data-icon="users"></span> Friends <span class="badge" style="height:17px;padding:0 6px" id="friend-count">8</span></button>
+          <button data-community-tab="clubs"><span data-icon="shield"></span> Clubs</button>
+          <button data-community-tab="forums"><span data-icon="message"></span> Forums</button>
+          <button data-community-tab="leaderboards"><span data-icon="trophy"></span> Leaderboards</button>
+        </div>
+
+        <div class="tab-pane active" data-community-pane="friends">
+          <div class="section-head" style="margin-bottom:12px">
+            <div><h2 style="font-size:17px">Your friends</h2><p>Online, playing or taking a break.</p></div>
+            <button class="btn btn-sm btn-outline" data-community-action="add-friend"><span data-icon="userPlus"></span> Add friend</button>
+          </div>
+          <div class="friend-grid" id="friend-grid"></div>
+
+          <div class="card" style="overflow:hidden;margin-top:16px">
+            <div class="widget-head" style="padding:15px 16px 10px"><h3 style="font-size:13px"><span data-icon="users"></span> Friend requests</h3><span class="badge badge-green" id="request-count">3</span></div>
+            <div id="request-list"></div>
+          </div>
+
+          <div class="section-head" style="margin:24px 0 12px">
+            <div><h2 style="font-size:17px">Players you may know</h2><p>From your clubs and recent games.</p></div>
+            <button class="link-more" data-community-action="add-friend">See all <span data-icon="arrowRight"></span></button>
+          </div>
+          <div class="friend-grid" id="suggested-grid"></div>
+        </div>
+
+        <div class="tab-pane" data-community-pane="clubs">
+          <div class="section-head" style="margin-bottom:12px">
+            <div><h2 style="font-size:17px">Clubs for every obsession</h2><p>Openings, endgames, speed chess and the occasional argument.</p></div>
+            <button class="btn btn-sm btn-primary" data-community-action="create-club"><span data-icon="plus"></span> Create club</button>
+          </div>
+          <div class="club-grid" id="club-grid"></div>
+          <div class="card club-cta" style="margin-top:16px">
+            <span class="emblem">♟</span>
+            <h4>Can't find your people?</h4>
+            <p>Start a club around your opening, your city or your favourite time control. It takes about a minute.</p>
+            <button class="btn btn-sm btn-outline" data-community-action="create-club">Start a club</button>
+          </div>
+        </div>
+
+        <div class="tab-pane" data-community-pane="forums">
+          <div class="section-head" style="margin-bottom:12px">
+            <div><h2 style="font-size:17px">The forum</h2><p>Long-form chess talk, from opening prep to club night stories.</p></div>
+            <button class="btn btn-sm btn-primary" data-community-action="new-thread"><span data-icon="plus"></span> New thread</button>
+          </div>
+          <div class="filter-row" style="margin-bottom:12px">
+            <button class="chip active" data-forum-filter="All">All topics</button>
+            <button class="chip" data-forum-filter="Openings">Openings</button>
+            <button class="chip" data-forum-filter="Tactics">Tactics</button>
+            <button class="chip" data-forum-filter="Training">Training</button>
+            <button class="chip" data-forum-filter="Community">Community</button>
+          </div>
+          <div class="card" style="overflow:hidden" id="thread-list"></div>
+        </div>
+
+        <div class="tab-pane" data-community-pane="leaderboards">
+          <div class="section-head" style="margin-bottom:12px">
+            <div><h2 style="font-size:17px">This week's leaders</h2><p>Rated games only. Updated every few minutes.</p></div>
+            <div class="filter-row">
+              <button class="chip active" data-board-filter="Blitz">Blitz</button>
+              <button class="chip" data-board-filter="Rapid">Rapid</button>
+              <button class="chip" data-board-filter="Bullet">Bullet</button>
+            </div>
+          </div>
+          <div class="card" style="overflow:hidden">
+            <table class="leaderboard-table">
+              <thead><tr><th>#</th><th>Player</th><th>Rating</th><th>Games</th><th>Win rate</th><th>Streak</th></tr></thead>
+              <tbody id="leaderboard-body"></tbody>
+            </table>
+          </div>
+          <div class="row gap-8 mt-16" style="justify-content:flex-end">
+            <span class="tiny muted">Your rank: <b style="color:var(--text-2)">#14,208</b></span>
+            <button class="btn btn-sm btn-outline" data-community-action="leaderboard-info">How rankings work</button>
+          </div>
+        </div>
+      </div>
+
+      <aside class="community-side">
+        <div class="card">
+          <div class="widget-head"><h3><span class="status-dot online"></span> Online now</h3><span class="count" id="online-count">6</span></div>
+          <div class="widget-body friend-online-list" id="online-list"></div>
+          <div class="widget-foot"><button class="btn btn-sm btn-outline btn-block" data-action="friends">Open friends <span data-icon="arrowRight"></span></button></div>
+        </div>
+
+        <div class="card">
+          <div class="widget-head"><h3><span data-icon="message"></span> Clubhouse chat</h3><span class="badge badge-green"><span class="live-dot"></span> 24 on</span></div>
+          <div class="widget-body">
+            <div class="chat-panel" style="height:220px">
+              <div class="chat-messages" id="community-chat"></div>
+              <form class="chat-input" id="community-chat-form">
+                <input class="input" id="community-chat-input" placeholder="Say hello…" maxlength="140" aria-label="Chat message">
+                <button type="submit" aria-label="Send"><span data-icon="send"></span></button>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <div class="card club-cta">
+          <span class="emblem">⚔️</span>
+          <h4>Tactics Anonymous</h4>
+          <p>42.7k members · You're a member<br>“We meet daily. There are no steps.”</p>
+          <button class="btn btn-sm btn-outline" data-community-action="club-open" data-club="cl2">Open club</button>
+        </div>
+
+        <div class="card side-card">
+          <h3 style="font-size:13px;margin-bottom:7px">House rules</h3>
+          <p class="tiny muted" style="line-height:1.65">Be kind. No engine assistance in rated games. Disagree with the move, not the person. Report harassment — we read every report.</p>
+          <div class="row gap-6 mt-12"><span class="badge">Fair play</span><span class="badge">Respect</span><span class="badge">Fun</span></div>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <div id="site-footer"></div>
+
+  <script src="assets/js/data.js?v=20261021b"></script>
+  <script src="assets/js/engine.js?v=20261021b"></script>
+  <script src="assets/js/app.js?v=20261021b"></script>
+  <script src="assets/js/board.js?v=20261021b"></script>
+  <script src="assets/js/community.js?v=20261021b"></script>
+</body>
+</html>

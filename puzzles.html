@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#070b0f">
+  <meta name="description" content="Train chess tactics at Gambit — rated puzzles, daily streaks and themed sets.">
+  <title>Puzzles — Gambit</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='24' fill='%2322c55e'/%3E%3Ctext x='50' y='78' font-size='70' text-anchor='middle'%3E%E2%99%9E%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="assets/css/base.css?v=20261021b">
+  <link rel="stylesheet" href="assets/css/pages.css?v=20261021b">
+</head>
+<body data-page="puzzles">
+  <div id="site-header"></div>
+
+  <main class="container">
+    <div class="page-head">
+      <div>
+        <span class="eyebrow">Sharpen your eye</span>
+        <h1>Puzzles that stick.</h1>
+        <p>One pattern at a time. Every puzzle is taken from a real game and rated to match your level.</p>
+      </div>
+      <div class="row gap-8">
+        <button class="btn" data-puzzle-action="rush"><span data-icon="bolt"></span> Puzzle Rush</button>
+        <a class="btn btn-primary" href="#puzzle-board"><span data-icon="puzzle"></span> Start training</a>
+      </div>
+    </div>
+
+    <div class="stat-cards">
+      <div class="card stat-card">
+        <span class="stat-ic"><span data-icon="target"></span></span>
+        <div><b id="puzzle-rating">2,108</b><span>Puzzle rating</span></div>
+        <span class="delta" id="rating-delta">+64 this week</span>
+      </div>
+      <div class="card stat-card">
+        <span class="stat-ic gold"><span data-icon="flame"></span></span>
+        <div><b id="puzzle-streak">12 days</b><span>Current streak</span></div>
+        <span class="delta" style="color:var(--accent)">Personal best</span>
+      </div>
+      <div class="card stat-card">
+        <span class="stat-ic blue"><span data-icon="check"></span></span>
+        <div><b id="puzzle-solved">1,284</b><span>Puzzles solved</span></div>
+        <span class="delta">+86 this month</span>
+      </div>
+      <div class="card stat-card">
+        <span class="stat-ic red"><span data-icon="trend"></span></span>
+        <div><b>86%</b><span>Accuracy</span></div>
+        <span class="delta">Top 8% of players</span>
+      </div>
+    </div>
+
+    <div class="puzzle-shell">
+      <div class="puzzle-board-col">
+        <div class="puzzle-bar card">
+          <div class="row gap-8">
+            <span class="badge badge-green" id="puzzle-number">Puzzle #1</span>
+            <span class="badge" id="puzzle-theme">Back-rank mate</span>
+            <span class="badge badge-gold" id="puzzle-rated">Rated 860</span>
+          </div>
+          <span class="row gap-6 small muted" id="puzzle-turn"><span class="status-dot online"></span> White to move</span>
+        </div>
+
+        <div id="puzzle-board"></div>
+
+        <div class="puzzle-actions">
+          <button class="btn btn-sm" data-puzzle-action="hint"><span data-icon="sparkles"></span> Hint</button>
+          <button class="btn btn-sm" data-puzzle-action="solution"><span data-icon="eye"></span> Show solution</button>
+          <button class="btn btn-sm btn-ghost" data-puzzle-action="reset"><span data-icon="refresh"></span> Retry</button>
+          <div class="grow"></div>
+          <div class="puzzle-dots" id="puzzle-dots"></div>
+          <button class="btn btn-sm btn-primary" data-puzzle-action="next">Next puzzle <span data-icon="arrowRight"></span></button>
+        </div>
+
+        <div class="puzzle-tip card">
+          <span class="feed-icon" style="width:30px;height:30px"><span data-icon="info"></span></span>
+          <p class="small muted" id="puzzle-tip">Find the strongest move for White. There is only one winning continuation.</p>
+        </div>
+      </div>
+
+      <aside class="puzzle-side">
+        <div class="card side-card">
+          <div class="puzzle-prompt">
+            <span class="pulse-ring"><span data-icon="puzzle"></span></span>
+            <div><b>Find the best move</b><span id="prompt-sub">White to play · one move wins</span></div>
+          </div>
+          <div class="puzzle-meta">
+            <div class="meta-box"><span>Rating</span><b id="meta-rating">860</b></div>
+            <div class="meta-box"><span>Theme</span><b id="meta-theme" style="font-size:11.5px">Back-rank</b></div>
+          </div>
+          <div class="solution-box">
+            <div class="row"><span class="tiny muted" style="text-transform:uppercase;letter-spacing:.1em;font-weight:700">Solution</span><span class="tiny muted" id="solution-status">Waiting for your move</span></div>
+            <div class="solution-moves" id="solution-moves">
+              <span class="tiny muted" style="font-style:italic">Find the winning line…</span>
+            </div>
+          </div>
+          <div class="hint-box" id="hint-box" style="margin-top:14px;padding:11px 12px;border-radius:9px;background:var(--surface-2);border:1px solid var(--border);display:none">
+            <div class="row gap-6 tiny" style="color:var(--accent);font-weight:700;margin-bottom:4px"><span data-icon="sparkles"></span> HINT</div>
+            <p class="tiny muted" id="hint-text"></p>
+          </div>
+          <div class="row gap-6 mt-16" style="justify-content:space-between">
+            <span class="tiny muted">Attempts</span>
+            <span class="tiny strong" id="attempt-count">0</span>
+          </div>
+          <div class="row gap-6 mt-8" style="justify-content:space-between">
+            <span class="tiny muted">Your score for this puzzle</span>
+            <span class="tiny strong" id="score-value">—</span>
+          </div>
+        </div>
+
+        <div class="card side-card">
+          <div class="row" style="justify-content:space-between;margin-bottom:6px">
+            <h3 style="font-size:13px">Your streak</h3>
+            <span class="badge badge-gold"><span data-icon="flame"></span> 12</span>
+          </div>
+          <p class="tiny muted">Solve one puzzle a day to keep the flame alive.</p>
+          <div class="streak-days" id="streak-days"></div>
+          <div class="row gap-6 mt-12" style="justify-content:space-between">
+            <span class="tiny muted">Longest streak</span><span class="tiny strong">27 days</span>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="widget-head"><h3><span data-icon="puzzle"></span> This session</h3><span class="count" id="session-count">0 / 6</span></div>
+          <div class="widget-body" style="padding:0 8px 10px">
+            <div class="puzzle-list" id="puzzle-list"></div>
+          </div>
+        </div>
+
+        <div class="card side-card">
+          <h3 style="font-size:13px;margin-bottom:8px">Filter by theme</h3>
+          <div class="theme-chips" id="theme-chips"></div>
+        </div>
+      </aside>
+    </div>
+
+    <section class="section">
+      <div class="section-head">
+        <div><h2>More ways to train</h2><p>Short, focused sessions that fit into a coffee break.</p></div>
+        <a class="link-more" href="learn.html">Tactics course <span data-icon="arrowRight"></span></a>
+      </div>
+      <div class="course-grid" style="grid-template-columns:repeat(3,1fr)">
+        <div class="card course-card card-hover">
+          <div class="course-cover" style="background:linear-gradient(120deg,#1c4a33,#0c1b13)">
+            <span class="glyph">⚡</span><span class="badge badge-live" style="position:absolute;top:11px;left:11px"><span class="live-dot"></span> Timed</span>
+          </div>
+          <div class="course-body">
+            <h3>Puzzle Rush</h3>
+            <p>Solve as many puzzles as you can in three minutes. One wrong move ends the run.</p>
+            <div class="course-meta"><span>Best: 34 solved</span><button class="btn btn-sm btn-outline" data-puzzle-action="rush">Play</button></div>
+          </div>
+        </div>
+        <div class="card course-card card-hover">
+          <div class="course-cover" style="background:linear-gradient(120deg,#3b3a6b,#121024)">
+            <span class="glyph">⚔️</span>
+          </div>
+          <div class="course-body">
+            <h3>Puzzle Battle</h3>
+            <p>Race a player of similar rating through the same five puzzles. Fastest finger wins.</p>
+            <div class="course-meta"><span>1,204 in queue</span><button class="btn btn-sm btn-outline" data-puzzle-action="battle">Find match</button></div>
+          </div>
+        </div>
+        <div class="card course-card card-hover">
+          <div class="course-cover" style="background:linear-gradient(120deg,#5b3a1d,#1e1208)">
+            <span class="glyph">🎯</span>
+          </div>
+          <div class="course-body">
+            <h3>Custom sets</h3>
+            <p>Build a set around your weaknesses: forks, back-rank mates, endgame studies and more.</p>
+            <div class="course-meta"><span>18 themes</span><button class="btn btn-sm btn-outline" data-puzzle-action="custom">Create set</button></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="site-footer"></div>
+
+  <div class="modal-backdrop" id="puzzle-solved-modal" aria-hidden="true">
+    <div class="modal narrow" role="dialog" aria-modal="true" aria-labelledby="solved-title">
+      <div class="modal-head">
+        <div><h3 id="solved-title">Puzzle solved</h3><p id="solved-sub">Clean finish. Keep the streak alive.</p></div>
+        <button class="modal-close" data-close-modal="puzzle-solved-modal" aria-label="Close"><span data-icon="x"></span></button>
+      </div>
+      <div class="modal-body">
+        <div class="game-result">
+          <div class="result-icon"><span data-icon="check"></span></div>
+          <h3 id="solved-headline">Nicely spotted.</h3>
+          <p id="solved-line">Rd8# — the eighth rank was undefended.</p>
+          <div class="result-rating"><span data-icon="trend"></span> <span id="solved-rating">+12 puzzle rating</span></div>
+        </div>
+        <div class="result-stats row" style="justify-content:center;gap:28px;margin-top:8px">
+          <div class="center"><b style="font-family:var(--display);font-size:16px" id="solved-rating-val">2,120</b><div class="tiny muted">New rating</div></div>
+          <div class="center"><b style="font-family:var(--display);font-size:16px" id="solved-streak">13 days</b><div class="tiny muted">Streak</div></div>
+          <div class="center"><b style="font-family:var(--display);font-size:16px" id="solved-moves">1</b><div class="tiny muted">Moves</div></div>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn" data-close-modal="puzzle-solved-modal">Review</button>
+        <button class="btn btn-primary" id="next-from-modal">Next puzzle <span data-icon="arrowRight"></span></button>
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/js/data.js?v=20261021b"></script>
+  <script src="assets/js/engine.js?v=20261021b"></script>
+  <script src="assets/js/app.js?v=20261021b"></script>
+  <script src="assets/js/board.js?v=20261021b"></script>
+  <script src="assets/js/puzzles.js?v=20261021b"></script>
+</body>
+</html>

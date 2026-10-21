@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#070b0f">
+  <meta name="description" content="Gambit — the friendly home of online chess. Play, solve puzzles, learn openings, watch live chess and connect with players.">
+  <title>Gambit — Play Chess Online</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='24' fill='%2322c55e'/%3E%3Ctext x='50' y='78' font-size='70' text-anchor='middle'%3E%E2%99%9E%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="assets/css/base.css?v=20261021b">
+  <link rel="stylesheet" href="assets/css/pages.css?v=20261021b">
+</head>
+<body data-page="home">
+  <div id="site-header"></div>
+
+  <main>
+    <section class="hero container">
+      <div class="hero-copy">
+        <span class="eyebrow">The friendly chess club</span>
+        <h1>Your next <span class="serif-italic">great</span> game starts here.</h1>
+        <p>Play in seconds, learn from every move, and find people who love the game as much as you do. No noise — just chess.</p>
+        <div class="hero-actions">
+          <a class="btn btn-primary btn-lg" href="play.html"><span data-icon="play"></span> Play now</a>
+          <button class="btn btn-lg" data-action="friends"><span data-icon="users"></span> Find a friend</button>
+        </div>
+        <div class="hero-trust">
+          <div class="avatar-stack">
+            <span class="avatar tone-2">MC</span>
+            <span class="avatar tone-3">DA</span>
+            <span class="avatar tone-4">IL</span>
+            <span class="avatar tone-5">TK</span>
+            <span class="avatar" style="background:var(--surface-3);color:var(--text-2);font-size:9px">+9k</span>
+          </div>
+          <p><b>42,118 players</b> online right now<br>1.2M games played today</p>
+        </div>
+      </div>
+
+      <div class="hero-visual">
+        <div class="match-card card-glow">
+          <div class="match-head">
+            <span class="badge badge-live"><span class="live-dot"></span> Live game</span>
+            <span class="row gap-6 small muted"><span data-icon="clock"></span> Rapid · 10+0</span>
+          </div>
+          <div class="player-bar">
+            <span class="avatar tone-2">MC</span>
+            <div class="player-copy">
+              <div class="player-name">Maya Chen <span class="badge badge-gold">IM</span></div>
+              <div class="player-sub">2104 · <span>🇨🇦 Canada</span></div>
+            </div>
+            <div class="clock active">04:12</div>
+          </div>
+          <div id="hero-board"></div>
+          <div class="player-bar">
+            <span class="avatar">AM</span>
+            <div class="player-copy">
+              <div class="player-name">You <span class="badge">1842</span></div>
+              <div class="player-sub">White · 34 moves</div>
+            </div>
+            <div class="clock">03:58</div>
+          </div>
+          <div class="match-foot">
+            <span class="row gap-6"><span data-icon="eye"></span> 1,284 watching</span>
+            <span class="row gap-6" style="color:var(--brand)"><span class="live-dot"></span> Move 35 · your turn</span>
+          </div>
+        </div>
+        <div class="float-chip one"><span data-icon="flame"></span><span><span class="tiny">Puzzle streak</span>12 days strong</span></div>
+        <div class="float-chip two"><span data-icon="trend"></span><span><span class="tiny">This week</span>+64 rating</span></div>
+      </div>
+    </section>
+
+    <section class="container" style="padding-bottom:8px">
+      <div class="mode-strip">
+        <a class="mode-card" href="play.html">
+          <span class="mode-icon"><span data-icon="play"></span></span>
+          <div><h3>Play online</h3><p>Instant pairings at every level.</p></div>
+          <span class="arrow"><span data-icon="arrowUpRight"></span></span>
+        </a>
+        <a class="mode-card" href="play.html?mode=computer">
+          <span class="mode-icon"><span data-icon="crosshair"></span></span>
+          <div><h3>Play the computer</h3><p>From beginner to master bots.</p></div>
+          <span class="arrow"><span data-icon="arrowUpRight"></span></span>
+        </a>
+        <button class="mode-card" data-action="friends" style="text-align:left">
+          <span class="mode-icon"><span data-icon="sword"></span></span>
+          <div><h3>Challenge a friend</h3><p>Send a link, pick your clock.</p></div>
+          <span class="arrow"><span data-icon="arrowUpRight"></span></span>
+        </button>
+        <a class="mode-card" href="puzzles.html">
+          <span class="mode-icon"><span data-icon="puzzle"></span></span>
+          <div><h3>Solve a puzzle</h3><p>Sharpen your eye in 3 minutes.</p></div>
+          <span class="arrow"><span data-icon="arrowUpRight"></span></span>
+        </a>
+      </div>
+    </section>
+
+    <div class="container dashboard-grid">
+      <div class="dash-main">
+        <section>
+          <div class="section-head">
+            <div><h2>Pick up where you left off</h2><p>Small sessions, real progress.</p></div>
+            <a class="link-more" href="learn.html">All courses <span data-icon="arrowRight"></span></a>
+          </div>
+          <div class="continue-grid">
+            <a class="continue-card card card-hover" href="learn.html">
+              <span class="continue-icon" style="background:linear-gradient(145deg,#86efac,#22c55e)"><span data-icon="book"></span></span>
+              <div class="grow">
+                <h4>The Complete Openings Bootcamp</h4>
+                <p>Lesson 15 of 24 · Two Knights</p>
+                <div class="progress"><i style="width:62%"></i></div>
+              </div>
+              <span class="badge badge-green">62%</span>
+            </a>
+            <a class="continue-card card card-hover" href="puzzles.html">
+              <span class="continue-icon" style="background:linear-gradient(145deg,#fcd34d,#f59e0b)"><span data-icon="flame"></span></span>
+              <div class="grow">
+                <h4>Daily puzzle streak</h4>
+                <p>12 days · next puzzle in 6h</p>
+                <div class="progress"><i style="width:80%;background:linear-gradient(90deg,#f59e0b,#fcd34d)"></i></div>
+              </div>
+              <span class="badge badge-gold">12 🔥</span>
+            </a>
+          </div>
+        </section>
+
+        <section>
+          <div class="section-head">
+            <div><h2>Puzzle of the day <span class="muted" style="font-size:12px;font-weight:400">· rated 1420</span></h2><p>White to play. Mate in one.</p></div>
+            <a class="link-more" href="puzzles.html">Puzzle trainer <span data-icon="arrowRight"></span></a>
+          </div>
+          <div class="puzzle-banner card card-glow">
+            <div id="daily-board"></div>
+            <div>
+              <span class="badge badge-green"><span data-icon="target"></span> Mate in 1 · Scholar's</span>
+              <h3>Find the move that ends it.</h3>
+              <p>The bishop and queen are already pointing at the weakest square on the board. One move finishes the game.</p>
+              <div class="puzzle-nums">
+                <div><b>2,108</b><span>Your rating</span></div>
+                <div><b>12</b><span>Day streak</span></div>
+                <div><b>86%</b><span>Accuracy</span></div>
+              </div>
+              <a class="btn btn-primary mt-16" href="puzzles.html"><span data-icon="puzzle"></span> Solve it</a>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <div class="section-head">
+            <div><h2>Live right now</h2><p>Streams, arenas and the good kind of noise.</p></div>
+            <a class="link-more" href="watch.html">Watch all <span data-icon="arrowRight"></span></a>
+          </div>
+          <div class="stream-strip">
+            <a class="stream-card card card-hover" href="watch.html">
+              <div class="stream-thumb tone-g1">
+                <span class="poster">Titled Tuesday</span>
+                <span class="badge badge-live"><span class="live-dot"></span> Live</span>
+                <span class="viewers">18.4k watching</span>
+              </div>
+              <div class="stream-info">
+                <h4>Titled Tuesday — round 7 with 12 seconds left</h4>
+                <p>Blitz · English</p>
+                <div class="stream-user"><span class="avatar tone-4">NP</span><span>NadiaPetrova</span><span class="badge badge-gold">IM</span></div>
+              </div>
+            </a>
+            <a class="stream-card card card-hover" href="watch.html">
+              <div class="stream-thumb tone-g2">
+                <span class="poster">Road to 2600</span>
+                <span class="badge badge-live"><span class="live-dot"></span> Live</span>
+                <span class="viewers">9.2k watching</span>
+              </div>
+              <div class="stream-info">
+                <h4>Rating climb, no engine — day 14</h4>
+                <p>Rapid · English</p>
+                <div class="stream-user"><span class="avatar tone-2">GM</span><span>GM_Marcus</span><span class="badge">GM</span></div>
+              </div>
+            </a>
+            <a class="stream-card card card-hover" href="watch.html">
+              <div class="stream-thumb tone-g4">
+                <span class="poster">Najdorf Lab</span>
+                <span class="badge badge-live"><span class="live-dot"></span> Live</span>
+                <span class="viewers">3.1k watching</span>
+              </div>
+              <div class="stream-info">
+                <h4>Sicilian Najdorf deep dive — your lines</h4>
+                <p>Study · English</p>
+                <div class="stream-user"><span class="avatar tone-5">CE</span><span>CoachElias</span><span class="badge badge-blue">Coach</span></div>
+              </div>
+            </a>
+          </div>
+        </section>
+
+        <section>
+          <div class="section-head">
+            <div><h2>Tournaments today</h2><p>Jump in — most take under an hour.</p></div>
+            <a class="link-more" href="tournaments.html">Full schedule <span data-icon="arrowRight"></span></a>
+          </div>
+          <div class="card">
+            <div class="tourney-list">
+              <div class="tourney-row">
+                <div class="tourney-time"><b>18:00</b><span>in 42m</span></div>
+                <div class="tourney-info"><h4>Sunset Blitz Arena <span class="badge badge-gold">500 prize</span></h4><p>3+2 · Arena · 1,842 players registered</p></div>
+                <div class="tourney-meta"><span class="badge badge-green">Free</span><button class="btn btn-sm btn-primary" data-join-tourney="Sunset Blitz Arena">Join</button></div>
+              </div>
+              <div class="tourney-row">
+                <div class="tourney-time"><b>20:30</b><span>in 3h</span></div>
+                <div class="tourney-info"><h4>Midnight Rapid <span class="badge">10+5</span></h4><p>Swiss · 764 players registered</p></div>
+                <div class="tourney-meta"><span class="badge badge-green">Free</span><button class="btn btn-sm" data-join-tourney="Midnight Rapid">Join</button></div>
+              </div>
+              <div class="tourney-row">
+                <div class="tourney-time"><b>Sat</b><span>14:00</span></div>
+                <div class="tourney-info"><h4>Weekend Classical <span class="badge badge-gold">1,000 prize</span></h4><p>30+0 · Swiss · 412 players registered</p></div>
+                <div class="tourney-meta"><span class="badge badge-blue">Members</span><button class="btn btn-sm" data-join-tourney="Weekend Classical">Register</button></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <div class="section-head">
+            <div><h2>From the community</h2><p>Ideas, games and the occasional hot take.</p></div>
+            <a class="link-more" href="community.html">Visit forums <span data-icon="arrowRight"></span></a>
+          </div>
+          <div class="card">
+            <div class="feed-item">
+              <span class="feed-icon"><span data-icon="message"></span></span>
+              <div class="grow">
+                <p><b>Ravi Patel</b> asked: “What is the most underrated opening for club players?”</p>
+                <span>142 replies · 34 minutes ago</span>
+              </div>
+              <span class="badge">Openings</span>
+            </div>
+            <div class="feed-item">
+              <span class="feed-icon"><span data-icon="sparkles"></span></span>
+              <div class="grow">
+                <p><b>Diego Alvarez</b> shared a 14-move miniature from club night — the finish is worth a look.</p>
+                <span>89 replies · 1 hour ago</span>
+              </div>
+              <span class="badge">Tactics</span>
+            </div>
+            <div class="feed-item">
+              <span class="feed-icon"><span data-icon="trophy"></span></span>
+              <div class="grow">
+                <p><b>Tactics Anonymous</b> won the weekly club arena with a 9–1 score.</p>
+                <span>Club news · 2 hours ago</span>
+              </div>
+              <span class="badge badge-gold">Arena</span>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <aside class="dash-side">
+        <div class="card profile-mini">
+          <div class="profile-mini-top">
+            <span class="avatar lg avatar-ring">AM</span>
+            <div class="grow">
+              <h3>Alex Morgan</h3>
+              <span class="handle">@alexm · 🇬🇧</span>
+            </div>
+            <a class="icon-btn" href="profile.html" aria-label="View profile"><span data-icon="chevronRight"></span></a>
+          </div>
+          <div class="profile-mini-stats">
+            <div><b>1842</b><span>Rapid</span></div>
+            <div><b>1716</b><span>Blitz</span></div>
+            <div><b>2108</b><span>Puzzles</span></div>
+          </div>
+          <div class="progress-label"><span>Level 24 · Club Player</span><span>720 / 1000 XP</span></div>
+          <div class="progress thin"><i style="width:72%"></i></div>
+          <a class="btn btn-sm btn-block mt-16" href="profile.html">View my profile</a>
+        </div>
+
+        <div class="card">
+          <div class="widget-head">
+            <h3><span data-icon="users"></span> Friends online</h3>
+            <span class="count">6</span>
+          </div>
+          <div class="friend-online-list" id="home-friends"></div>
+          <div class="widget-foot">
+            <button class="btn btn-sm btn-ghost btn-block" data-action="friends">See all friends <span data-icon="arrowRight"></span></button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="widget-head">
+            <h3><span data-icon="trophy"></span> Weekly leaderboard</h3>
+            <a class="tiny muted" href="community.html">View all</a>
+          </div>
+          <div class="leader-list" id="home-leaders"></div>
+          <div class="widget-foot">
+            <div class="row" style="justify-content:space-between;font-size:10.5px;color:var(--muted)">
+              <span>Your rank</span><span class="strong" style="color:var(--text-2)">#12,408</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="padding:18px;background:linear-gradient(135deg, rgba(74,222,128,.1), var(--surface) 70%)">
+          <span class="badge badge-green"><span data-icon="sparkles"></span> Weekly goal</span>
+          <h3 style="font-size:14px;margin:10px 0 4px">Play 10 rated games</h3>
+          <p class="small muted">You are 7 games in. Three more to unlock the weekend badge.</p>
+          <div class="progress mt-12"><i style="width:70%"></i></div>
+          <a class="btn btn-sm btn-primary btn-block mt-16" href="play.html">Find a game</a>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <div id="site-footer"></div>
+
+  <script src="assets/js/data.js?v=20261021b"></script>
+  <script src="assets/js/engine.js?v=20261021b"></script>
+  <script src="assets/js/app.js?v=20261021b"></script>
+  <script src="assets/js/board.js?v=20261021b"></script>
+  <script src="assets/js/home.js?v=20261021b"></script>
+</body>
+</html>
