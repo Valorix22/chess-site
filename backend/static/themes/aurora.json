@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "name": "Aurora condivisa",
+  "site": {
+    "bg": "#191324",
+    "panel": "#261d34",
+    "surface": "#392b48",
+    "line": "#51405f",
+    "text": "#f8edf9",
+    "muted": "#b9a0c6",
+    "accent": "#e6abed",
+    "accentInk": "#3b1f48"
+  },
+  "board": {
+    "light": "#eee5f5",
+    "dark": "#9d83ad"
+  },
+  "font": "sans",
+  "pieceStyle": "classic",
+  "boardStyle": "flat",
+  "density": "comfortable",
+  "radius": 12
+}

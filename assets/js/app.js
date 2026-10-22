@@ -101,24 +101,12 @@
 
   /* ---------------- state ---------------- */
   const DEFAULT_SETTINGS = { theme: 'dark', boardTheme: 'green', sound: true, coordinates: true, animations: true, autoPromote: false };
-  const demo = window.GAMBIT.demoUser;
-
-  let user;
-  const storedUser = Store.get('gambit.user', '__none__');
-  if (storedUser === '__none__') user = demo;
-  else user = storedUser;
-
-  const settings = Object.assign({}, DEFAULT_SETTINGS, Store.get('gambit.settings', {}));
-  const chats = Store.get('gambit.chats', {
-    f1: [{ me: false, text: 'gg! That was a sharp line. Rematch tomorrow?', time: '12:04' }],
-    f2: [{ me: true, text: 'Good luck in the arena tonight!', time: '09:12' }, { me: false, text: 'Thanks! Are you joining?', time: '09:14' }],
-    f3: [{ me: false, text: 'Sent you the Berlin study — check the notes on move 12.', time: 'Yesterday' }],
-    f5: [{ me: true, text: 'Nice tactic in that last game 👀', time: 'Mon' }]
-  });
-  const savedFriends = Store.get('gambit.addedFriends', []);
-  const requests = window.GAMBIT.requests.slice();
-  const friends = window.GAMBIT.friends.slice();
-  savedFriends.forEach((f) => { if (!friends.some((x) => x.id === f.id)) friends.push(f); });
+  let user = window.GAMBIT.currentUser;
+  const settings = Object.assign({}, DEFAULT_SETTINGS, window.GAMBIT.preferences || {});
+  const chats = {};
+  const requests = window.GAMBIT.requests;
+  const friends = window.GAMBIT.friends;
+  let preferenceTimer;
 
   let lastFocus = null;
   let activeDropdown = null;
@@ -132,51 +120,16 @@
   }
   function avatar(person, cls) {
     const p = typeof person === 'string' ? { name: person } : person;
-    return `<span class="avatar ${p.tone || ''} ${cls || ''}">${esc(initials(p.name))}</span>`;
+    return `<span class="avatar ${/^tone-[a-z0-9-]+$/.test(p.tone || '') ? p.tone : ''} ${cls || ''}">${esc(initials(p.name))}</span>`;
   }
   const ratingFmt = (n) => Number(n).toLocaleString('en-US');
 
-  /* ---------------- sound ---------------- */
-  let audioCtx = null;
-  function audio() {
-    if (!audioCtx) {
-      const Ctx = window.AudioContext || window.webkitAudioContext;
-      if (!Ctx) return null;
-      audioCtx = new Ctx();
-    }
-    if (audioCtx.state === 'suspended') audioCtx.resume();
-    return audioCtx;
-  }
-  function beep(freq, dur, type, gain, when) {
-    const ctx = audio();
-    if (!ctx) return;
-    const osc = ctx.createOscillator();
-    const g = ctx.createGain();
-    osc.type = type || 'sine';
-    osc.frequency.setValueAtTime(freq, ctx.currentTime + (when || 0));
-    g.gain.setValueAtTime(0.0001, ctx.currentTime + (when || 0));
-    g.gain.exponentialRampToValueAtTime(gain || 0.05, ctx.currentTime + (when || 0) + 0.012);
-    g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + (when || 0) + dur);
-    osc.connect(g).connect(ctx.destination);
-    osc.start(ctx.currentTime + (when || 0));
-    osc.stop(ctx.currentTime + (when || 0) + dur + 0.02);
-  }
+  /* Original, locally served board samples; no synthetic replacement. */
   const Sound = {
-    play(name) {
-      if (!settings.sound) return;
-      switch (name) {
-        case 'move': beep(420, 0.07, 'triangle', 0.05); break;
-        case 'capture': beep(210, 0.1, 'square', 0.035); beep(140, 0.09, 'triangle', 0.04, 0.03); break;
-        case 'check': beep(660, 0.09, 'triangle', 0.045); beep(520, 0.12, 'triangle', 0.04, 0.08); break;
-        case 'win': [523, 659, 784, 1047].forEach((f, i) => beep(f, 0.16, 'triangle', 0.045, i * 0.09)); break;
-        case 'loss': [392, 330, 262].forEach((f, i) => beep(f, 0.18, 'triangle', 0.04, i * 0.1)); break;
-        case 'notify': beep(880, 0.07, 'sine', 0.035); beep(1175, 0.09, 'sine', 0.03, 0.07); break;
-        case 'click': beep(600, 0.03, 'sine', 0.02); break;
-        default: beep(500, 0.06, 'sine', 0.03);
-      }
-    }
+    play(name) { if (settings.sound && name !== 'click') window.BoardAudio?.gameSounds.play(name); },
+    move(san, options = {}) { if (settings.sound) window.BoardAudio?.gameSounds.play(window.BoardAudio.moveSound(san, options)); }
   };
-
+  for (const event of ['pointerdown','keydown']) document.addEventListener(event,()=>{if(settings.sound)window.BoardAudio?.gameSounds.unlock();},{capture:true});
   /* ---------------- theme & settings ---------------- */
   function effectiveTheme() {
     if (settings.theme === 'system') {
@@ -196,8 +149,10 @@
     document.dispatchEvent(new CustomEvent('gambit:settings', { detail: settings }));
   }
   function updateSettings(patch) {
+    if((patch.theme||patch.boardTheme)&&window.GAMBIT.legacyPreferences?.theme){window.GambitIntegration.clearCustomTheme();if(window.GambitSession.user)window.GambitAPI.post('/preferences',{theme:{version:1,name:'Predefinito',site:{},board:{}},sound:settings.sound,animations:settings.animations}).catch(error=>toast(error.message,'error'));}
     Object.assign(settings, patch);
     Store.set('gambit.settings', settings);
+    if(window.GambitSession.user){clearTimeout(preferenceTimer);preferenceTimer=setTimeout(()=>window.GambitAPI.patch('/platform/preferences',settings).catch(error=>toast(error.message,'error')),300);}
     applyTheme();
     applyBoardTheme();
     syncSettingsUI();
@@ -221,7 +176,7 @@
     const el = document.createElement('div');
     el.className = 'toast ' + (type === 'error' ? 'error' : type === 'info' ? 'info' : '');
     const ic = iconName || (type === 'error' ? 'info' : type === 'info' ? 'info' : 'check');
-    el.innerHTML = `<span class="toast-icon">${icon(ic)}</span><span>${message}</span>`;
+    el.innerHTML = `<span class="toast-icon">${icon(ic)}</span><span>${esc(message)}</span>`;
     stack.appendChild(el);
     setTimeout(() => {
       el.classList.add('out');
@@ -276,7 +231,7 @@
     el.setAttribute('aria-hidden', 'true');
     el.innerHTML = `<div class="modal ${o.width || ''}" role="dialog" aria-modal="true" aria-labelledby="${id}-title">
       <div class="modal-head">
-        <div><h3 id="${id}-title">${o.title}</h3>${o.subtitle ? `<p>${o.subtitle}</p>` : ''}</div>
+        <div><h3 id="${id}-title">${esc(o.title)}</h3>${o.subtitle ? `<p>${esc(o.subtitle)}</p>` : ''}</div>
         <button class="modal-close" data-close-modal="${id}" aria-label="Close">${icon('x')}</button>
       </div>
       <div class="modal-body">${o.body}</div>
@@ -323,7 +278,7 @@
           ${list.map((n) => `
             <div class="notif-item ${n.unread ? 'unread' : ''}" data-action="notif-read" data-id="${n.id}">
               <span class="notif-icon">${icon(n.icon)}</span>
-              <div class="notif-copy"><p>${n.text}</p><span>${n.time}</span></div>
+              <div class="notif-copy"><p>${esc(n.text)}</p><span>${esc(n.time)}</span></div>
               ${n.unread ? '<span class="status-dot online" style="margin-left:auto;margin-top:6px"></span>' : ''}
             </div>`).join('')}
         </div>
@@ -343,8 +298,7 @@
               <div class="tiny muted">${esc(user.handle)} · ${ratingFmt(user.rating)}</div>
             </div>
           </div>
-          <div class="progress mt-12"><i style="width:72%"></i></div>
-          <div class="tiny muted mt-8" style="margin-top:6px;display:flex;justify-content:space-between"><span>Level 24 · Club Player</span><span>720 / 1000 XP</span></div>
+          <div class="tiny muted mt-8">${esc(user.admin ? 'Amministratore' : 'Giocatore')} · ${esc(user.handle)}</div>
         </div>
         <div class="dropdown-sep"></div>
         <a class="dropdown-item" href="profile.html">${icon('user')} My profile</a>
@@ -366,7 +320,7 @@
           <span class="brand-name">gam<span>bit</span></span>
         </a>
         <nav class="main-nav" aria-label="Main">
-          ${NAV.map((n) => `<a href="${n.href}" class="${page === n.page ? 'active' : ''}">${icon(n.icon)}${n.label}</a>`).join('')}
+          ${NAV.filter(n=>n.page!=='watch'||window.GambitConfig.FEATURE_FLAGS.watch).map((n) => `<a href="${n.href}" class="${page === n.page ? 'active' : ''}">${icon(n.icon)}${n.label}</a>`).join('')}
         </nav>
         <div class="header-actions">
           <button class="search-trigger" data-action="palette" aria-label="Search">${icon('search')}<span>Search</span><kbd>⌘K</kbd></button>
@@ -409,13 +363,7 @@
   }
 
   function updateProfile(patch) {
-    if (!user) return null;
-    Object.assign(user, patch || {});
-    Store.set('gambit.user', user);
-    if (user.stats && patch && patch.stats) user.stats = Object.assign({}, user.stats, patch.stats);
-    renderHeader();
-    document.dispatchEvent(new CustomEvent('gambit:user', { detail: user }));
-    return user;
+    return window.GambitAPI.patch('/platform/profile',patch).then(()=>location.reload()).catch(error=>toast(error.message,'error'));
   }
 
   function updateNotifDot() {
@@ -435,21 +383,16 @@
           <div class="footer-brand">
             <a class="brand" href="index.html"><span class="brand-mark">♞</span><span class="brand-name">gam<span>bit</span></span></a>
             <p>The friendly home of online chess. Play, learn, and find your people — one move at a time.</p>
-            <div class="socials mt-16">
-              <a href="#" aria-label="Discord">${icon('message')}</a>
-              <a href="#" aria-label="YouTube">${icon('tv')}</a>
-              <a href="#" aria-label="Community">${icon('globe')}</a>
-              <a href="#" aria-label="Email">${icon('mail')}</a>
-            </div>
+
           </div>
           <div class="footer-col"><h5>Play</h5><a href="play.html">Play online</a><a href="play.html?mode=computer">vs Computer</a><a href="play.html?mode=friend">Play a friend</a><a href="puzzles.html">Puzzles</a><a href="tournaments.html">Tournaments</a></div>
           <div class="footer-col"><h5>Learn</h5><a href="learn.html">Courses</a><a href="learn.html">Openings</a><a href="learn.html">Endgames</a><a href="puzzles.html">Tactics trainer</a><a href="watch.html">Video library</a></div>
           <div class="footer-col"><h5>Community</h5><a href="community.html">Friends</a><a href="community.html">Clubs</a><a href="community.html">Forums</a><a href="community.html">Leaderboards</a><a href="watch.html">Streamers</a></div>
-          <div class="footer-col"><h5>Gambit</h5><a href="#">About</a><a href="#">Fair play</a><a href="#">Help centre</a><a href="#">Privacy</a><a href="#">Terms</a></div>
+          <div class="footer-col"><h5>Account</h5><a href="profile.html">Profilo e storico</a><button class="link-more" data-action="open-settings">Impostazioni</button><button class="link-more" data-action="friends">Amici e chat</button><a href="/classic/">Interfaccia classica</a></div>
         </div>
         <div class="footer-bottom">
-          <span>© 2026 Gambit Chess Ltd. Made for people who love the game.</span>
-          <span class="row gap-16"><a href="#">Status</a><a href="#">Blog</a><a href="#">Careers</a><span class="row gap-6" style="color:var(--brand)"><span class="live-dot"></span> 42,118 playing now</span></span>
+          <span>Gambit · Aura Chess · Stockfish 19</span>
+          <span class="row gap-16"><a href="/classic/">Interfaccia classica</a><a href="/privacy.html">Privacy</a><a href="/about.html">Regole e fonti</a></span>
         </div>
       </div>
     </footer>`;
@@ -621,6 +564,7 @@
         <button type="submit" aria-label="Send">${icon('send')}</button>
       </form>`;
     renderChatMessages();
+    loadChat(id);
     const input = $('#drawer-chat-input');
     if (input) setTimeout(() => input.focus(), 120);
     $('#drawer-chat-form')?.addEventListener('submit', (e) => {
@@ -628,7 +572,7 @@
       sendChat(friend.id, input.value);
       input.value = '';
     });
-    $$('[data-quickchat]').forEach((b) => b.addEventListener('click', () => sendChat(friend.id, b.dataset.quickchat)));
+
   }
 
   function renderChatMessages() {
@@ -644,49 +588,24 @@
   }
 
   function sendChat(id, text) {
-    if (!text || !text.trim()) return;
-    if (!chats[id]) chats[id] = [];
-    const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    chats[id].push({ me: true, text: text.trim(), time });
-    Store.set('gambit.chats', chats);
-    renderChatMessages();
-    const friend = friends.find((f) => f.id === id);
-    if (friend) {
-      const replies = [
-        'Ha! You saw that too?',
-        'Deal. Give me 10 minutes.',
-        'That line is wild — I looked at it for an hour last night.',
-        'Sounds good. I\'ll bring the coffee ☕',
-        'Rematch after this one?',
-        'Nice. Send me the PGN when you\'re done.',
-        'Okay, you have my attention 👀'
-      ];
-      setTimeout(() => {
-        if (!chats[id]) return;
-        chats[id].push({ me: false, text: replies[Math.floor(Math.random() * replies.length)], time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) });
-        Store.set('gambit.chats', chats);
-        if (activeChat && activeChat.id === id) { renderChatMessages(); Sound.play('notify'); }
-      }, 1300 + Math.random() * 900);
-    }
+    if (!text?.trim()) return;
+    return window.GambitAPI.post('/platform/messages/dm/'+encodeURIComponent(id),{text:text.trim()}).then(()=>loadChat(id)).catch(error=>toast(error.message,'error'));
+  }
+  async function loadChat(id) {
+    try { const data=await window.GambitAPI.get('/platform/messages/dm/'+encodeURIComponent(id)); chats[id]=data.items.map(m=>({id:m.id,me:m.author===window.GambitSession.user?.id,text:m.body,time:new Date(m.created*1000).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})})); if(activeChat?.id===id)renderChatMessages();window.GambitAPI.post('/platform/messages/dm/'+encodeURIComponent(id)+'/read').catch(()=>{}); }
+    catch(error){toast(error.message,'error');}
   }
 
-  function acceptRequest(id) {
-    const i = requests.findIndex((r) => r.id === id);
-    if (i < 0) return;
-    const [r] = requests.splice(i, 1);
-    friends.push(Object.assign({}, r, { status: 'online', activity: 'Just became friends', flag: r.flag }));
-    renderFriends();
-    updateNotifDot();
-    toast(`${esc(r.name)} is now your friend.`, 'success', 'userPlus');
-    Sound.play('notify');
-  }
-  function declineRequest(id) {
-    const i = requests.findIndex((r) => r.id === id);
-    if (i < 0) return;
-    requests.splice(i, 1);
-    renderFriends();
-    updateNotifDot();
-    toast('Friend request declined.', 'info');
+  function acceptRequest(id) { return window.GambitAPI.post('/friends/'+encodeURIComponent(id)+'/reply',{accept:true}).then(refreshFriends).catch(error=>toast(error.message,'error')); }
+  function declineRequest(id) { return window.GambitAPI.post('/friends/'+encodeURIComponent(id)+'/reply',{accept:false}).then(refreshFriends).catch(error=>toast(error.message,'error')); }
+  async function refreshFriends() {
+    if(!window.GambitSession.user)return;
+    const data=await window.GambitAPI.get('/friends');
+    friends.splice(0,friends.length,...data.friends.map(window.GambitAdapters.friend));
+    requests.splice(0,requests.length,...data.incoming.map(window.GambitAdapters.friend));
+    window.GAMBIT.outgoing=data.outgoing;
+    if(document.getElementById('friends-drawer')?.classList.contains('open'))renderFriends();
+    updateNotifDot();document.dispatchEvent(new CustomEvent('gambit:friends'));
   }
 
   /* ---------------- challenge ---------------- */
@@ -699,22 +618,15 @@
     openModal('challenge-modal');
   }
   function sendChallenge() {
-    const tc = $('#challenge-modal .time-opt.active b')?.textContent || '5+3';
-    const color = $('#challenge-modal [data-color].active')?.dataset.color || 'random';
-    if (!challengeTarget) { toast('Pick a friend to challenge first.', 'error'); closeModal('challenge-modal'); openFriends('online'); return; }
-    closeModal('challenge-modal');
-    toast(`Challenge sent to <b>${esc(challengeTarget.name)}</b> · ${tc} · ${color === 'random' ? 'random colour' : color + ' pieces'}.`, 'success', 'sword');
-    setTimeout(() => toast(`${esc(challengeTarget.name)} accepted your challenge!`, 'success', 'check'), 2400);
-    Sound.play('notify');
+    const tc=$('#challenge-modal .time-opt.active b')?.textContent || '5+3';
+    const [minutes,increment]=tc.split('+').map(Number),color=$('#challenge-modal [data-color].active')?.dataset.color||'random';
+    if(!challengeTarget){toast('Scegli un amico da sfidare.','info');return;}
+    const button=$('[data-action="send-challenge"]');if(button)button.disabled=true;
+    window.GambitAPI.post('/challenges',{recipient_id:challengeTarget.id,base:minutes*60,increment:increment||0,color,rated:!!$('#challenge-ranked')?.checked}).then(()=>{closeModal('challenge-modal');toast('Sfida inviata. Attendo la risposta.');}).catch(error=>toast(error.message,'error')).finally(()=>{if(button)button.disabled=false;});
   }
 
   /* ---------------- auth ---------------- */
-  function setUser(next) {
-    user = next;
-    Store.set('gambit.user', user);
-    renderHeader();
-    syncSettingsUI();
-  }
+  function setUser(next) { user=next;renderHeader();syncSettingsUI(); }
   function openAuth(mode) {
     switchAuthTab(mode === 'signup' ? 'signup' : 'login');
     openModal('auth-modal');
@@ -725,24 +637,15 @@
     const title = $('#auth-title');
     if (title) title.textContent = tab === 'signup' ? 'Create your account' : 'Welcome back';
   }
-  function handleAuth(form) {
-    const active = $('.auth-pane.active');
-    if (!active) return;
-    const isSignup = active.dataset.authPane === 'signup';
-    const inputs = $$('input', active);
-    const values = {};
-    inputs.forEach((i) => { values[i.name] = i.value.trim(); });
-    if (isSignup && !values.name) { toast('Please add a display name.', 'error'); return; }
-    if (!values.email || values.email.length < 3) { toast('Enter a valid email or username.', 'error'); return; }
-    if (!values.password || values.password.length < 4) { toast('Password must be at least 4 characters.', 'error'); return; }
-    const name = isSignup ? values.name : (values.email.includes('@') ? values.email.split('@')[0] : values.email);
-    const pretty = name.charAt(0).toUpperCase() + name.slice(1);
-    setUser(Object.assign({}, demo, {
-      name: pretty, handle: '@' + name.toLowerCase().replace(/[^a-z0-9]/g, ''), rating: isSignup ? 1200 : demo.rating
-    }));
-    closeModal('auth-modal');
-    toast(isSignup ? `Welcome to Gambit, ${esc(pretty)}! Your journey starts now.` : `Welcome back, ${esc(pretty)}.`, 'success', 'sparkles');
-    Sound.play('win');
+  async function handleAuth(form) {
+    const active=$('.auth-pane.active');if(!active)return;
+    const signup=active.dataset.authPane==='signup';const values={};$$('input',active).forEach(i=>{values[i.name]=i.name==='password'?i.value:i.value.trim();});
+    const name=signup?values.name:values.email;
+    if(!name || !values.password){toast('Inserisci nome utente e password.','error');return;}
+    if(signup && values.password.length<12){toast('Scegli una password di almeno 12 caratteri.','error');return;}
+    const button=$('button[type="submit"]',active);if(button)button.disabled=true;
+    try{await window.GambitSession.login(name,values.password,signup);if(window.GambitSession.user.must_change_password){closeModal('auth-modal');window.GambitIntegration.passwordDialog(true);}else location.reload();}
+    catch(error){toast(error.message,'error');}finally{if(button)button.disabled=false;}
   }
 
   /* ---------------- command palette ---------------- */
@@ -774,7 +677,7 @@
   }
   function renderPalette(query) {
     const q = query.trim().toLowerCase();
-    paletteFiltered = paletteActions.filter((a) => !q || (a.label + ' ' + a.hint).toLowerCase().includes(q));
+    paletteFiltered = paletteActions.filter((a) => (!a.href?.includes('watch.html') || window.GambitConfig.FEATURE_FLAGS.watch) && (!q || (a.label + ' ' + a.hint).toLowerCase().includes(q)));
     if (q) {
       const people = friends.filter((f) => f.name.toLowerCase().includes(q) || f.handle.toLowerCase().includes(q))
         .map((f) => ({ label: f.name, hint: 'Message friend', icon: 'message', action: 'chat', id: f.id, person: f }));
@@ -844,33 +747,25 @@
             <form id="auth-form" novalidate>
               <div class="auth-pane active" data-auth-pane="login">
                 <div class="stack gap-12">
-                  <div class="field"><label for="login-email">Email or username</label><input class="input" id="login-email" name="email" placeholder="you@example.com" autocomplete="username"></div>
+                  <div class="field"><label for="login-email">Username</label><input class="input" id="login-email" name="email" placeholder="nome_utente" autocomplete="username"></div>
                   <div class="field"><label for="login-password">Password</label><input class="input" id="login-password" name="password" type="password" placeholder="••••••••" autocomplete="current-password"></div>
                   <div class="row" style="justify-content:space-between;font-size:11.5px">
-                    <label class="row gap-6" style="cursor:pointer"><span class="checkbox checked">${icon('check')}</span> Remember me</label>
-                    <a href="#" style="color:var(--brand)" data-action="forgot-password">Forgot password?</a>
+                    <span class="tiny muted">Sessione sul dispositivo</span>
+
                   </div>
                   <button class="btn btn-primary btn-block" type="submit">Log in</button>
                 </div>
               </div>
               <div class="auth-pane" data-auth-pane="signup">
                 <div class="stack gap-12">
-                  <div class="field"><label for="signup-name">Display name</label><input class="input" id="signup-name" name="name" placeholder="How should we call you?" autocomplete="nickname"></div>
-                  <div class="field"><label for="signup-email">Email</label><input class="input" id="signup-email" name="email" placeholder="you@example.com" autocomplete="email"></div>
-                  <div class="field"><label for="signup-password">Password</label><input class="input" id="signup-password" name="password" type="password" placeholder="At least 4 characters" autocomplete="new-password"></div>
-                  <label class="row gap-8" style="font-size:11px;color:var(--muted);cursor:pointer"><span class="checkbox checked">${icon('check')}</span> I agree to the Terms and Fair Play policy</label>
+                  <div class="field"><label for="signup-name">Username</label><input class="input" id="signup-name" name="name" placeholder="How should we call you?" autocomplete="nickname"></div>
+                  <div class="field"><label for="signup-password">Password</label><input class="input" id="signup-password" name="password" type="password" placeholder="At least 12 characters" autocomplete="new-password"></div>
+                  <p class="tiny muted">Consulta la <a href="/privacy.html" target="_blank" rel="noopener">privacy</a> e le <a href="/about.html" target="_blank" rel="noopener">regole di gioco</a>. Gli account e le attività sono soggetti a moderazione.</p>
                   <button class="btn btn-primary btn-block" type="submit">Create my account</button>
                 </div>
               </div>
             </form>
-            <div class="auth-divider"><span>or continue with</span></div>
-            <div class="row gap-8">
-              <button class="btn grow" data-action="social-login">${icon('globe')} Google</button>
-              <button class="btn grow" data-action="social-login">${icon('smartphone')} Apple</button>
-            </div>
-            <p class="tiny muted center mt-16">Demo experience — no real account needed.
-              <button class="link-btn" data-action="demo-login">Continue as Alex →</button>
-            </p>
+
           </div>
         </div>
       </div>
@@ -983,6 +878,7 @@
     const footer = $('#site-footer');
     if (footer) footer.innerHTML = footerHTML();
     hydrateIcons();
+    window.GambitIntegration?.shellReady();
     applyBoardTheme();
     updateNotifDot();
 
@@ -1067,49 +963,38 @@
           closeDropdowns();
           confirmDialog({ title: 'Log out of Gambit?', text: 'Your games and progress are saved. You can sign back in any time.', confirm: 'Log out' }).then((ok) => {
             if (!ok) return;
-            setUser(null);
-            toast('You have been logged out.', 'info', 'logOut');
+            window.GambitSession.logout().catch(error=>toast(error.message,'error'));
           });
           break;
-        case 'demo-login':
-          setUser(Object.assign({}, demo));
-          closeModal('auth-modal');
-          toast('Welcome back, Alex. Ready for a game?', 'success', 'sparkles');
-          Sound.play('win');
-          break;
-        case 'social-login': toast('Social sign-in is disabled in this demo — use email or continue as Alex.', 'info', 'info'); break;
-        case 'forgot-password': toast('A reset link would be sent to your email. (Demo)', 'info', 'mail'); break;
         case 'read-all':
+          window.GambitAPI.post('/platform/notifications/read').catch(error=>toast(error.message,'error'));
           window.GAMBIT.notifications.forEach((n) => { n.unread = false; });
           $('#notification-list').innerHTML = window.GAMBIT.notifications.map((n) => `
             <div class="notif-item" data-action="notif-read" data-id="${n.id}">
               <span class="notif-icon">${icon(n.icon)}</span>
-              <div class="notif-copy"><p>${n.text}</p><span>${n.time}</span></div>
+              <div class="notif-copy"><p>${esc(n.text)}</p><span>${esc(n.time)}</span></div>
             </div>`).join('');
           updateNotifDot();
           toast('All notifications marked as read.', 'info', 'check');
           break;
         case 'notif-read': {
-          const item = window.GAMBIT.notifications.find((n) => n.id === actionEl.dataset.id);
-          if (item) item.unread = false;
+          const item = window.GAMBIT.notifications.find((n) => String(n.id) === actionEl.dataset.id);
+          window.GambitAPI.post('/platform/notifications/read',{id:Number(actionEl.dataset.id)}).catch(error=>toast(error.message,'error'));
+          if (item) {item.unread = false;if(item.link?.startsWith('/')&&!item.link.startsWith('//'))location.assign(item.link);}
           actionEl.classList.remove('unread');
           const dot = actionEl.querySelector('.status-dot'); if (dot) dot.remove();
           updateNotifDot();
           break;
         }
-        case 'notif-settings': closeDropdowns(); toast('Notification preferences are coming to settings soon.', 'info', 'bell'); break;
+        case 'notif-settings': closeDropdowns(); openModal('settings-modal'); break;
         case 'accept-request': acceptRequest(actionEl.dataset.id); break;
         case 'decline-request': declineRequest(actionEl.dataset.id); break;
         case 'send-friend-request':
-          actionEl.outerHTML = '<span class="badge badge-green">Request sent</span>';
-          toast('Friend request sent.', 'success', 'userPlus');
+          window.GambitIntegration.friendDialog();
           break;
         case 'send-challenge': sendChallenge(); break;
-        case 'create-challenge': closeFriends(); openChallenge(friends[0].id); break;
-        case 'invite-friend':
-      if (navigator.clipboard) navigator.clipboard.writeText(location.origin + '/invite/alexm').catch(() => {});
-          toast('Invite link copied — send it to a friend!', 'success', 'copy');
-          break;
+        case 'create-challenge': closeFriends(); if(friends.length)openChallenge(friends[0].id);else window.GambitIntegration.friendDialog(); break;
+        case 'invite-friend': window.GambitIntegration.friendDialog(); break;
         case 'notif-read-all': break;
         case 'open-palette': openPalette(); break;
         default: break;
@@ -1121,6 +1006,10 @@
     });
 
     document.addEventListener('keydown', (e) => {
+      if (e.key === 'Tab') {
+        const modal=Array.from(document.querySelectorAll('.modal-backdrop.open')).at(-1);
+        if(modal){const items=Array.from(modal.querySelectorAll('a[href],button,input,select,textarea,[tabindex]')).filter(el=>!el.disabled&&el.tabIndex>=0&&el.getClientRects().length);const first=items[0],last=items.at(-1);if(e.shiftKey&&(document.activeElement===first||!modal.contains(document.activeElement))){e.preventDefault();last?.focus();}else if(!e.shiftKey&&(document.activeElement===last||!modal.contains(document.activeElement))){e.preventDefault();first?.focus();}}
+      }
       const mod = e.metaKey || e.ctrlKey;
       if (mod && e.key.toLowerCase() === 'k') { e.preventDefault(); openPalette(); return; }
       if (e.key === 'Escape') {
@@ -1166,7 +1055,7 @@
     openFriends, closeFriends, openChat, openChallenge, openPalette,
     updateSettings, applyBoardTheme, applyTheme, renderHeader,
     openAuth, toggleTheme, hydrateIcons,
-    updateProfile,
+    updateProfile, refreshFriends, loadChat,
     getPage: () => document.body.dataset.page
   };
   window.Gambit = Gambit;

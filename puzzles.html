@@ -9,6 +9,7 @@
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='24' fill='%2322c55e'/%3E%3Ctext x='50' y='78' font-size='70' text-anchor='middle'%3E%E2%99%9E%3C/text%3E%3C/svg%3E">
   <link rel="stylesheet" href="assets/css/base.css?v=20261021b">
   <link rel="stylesheet" href="assets/css/pages.css?v=20261021b">
+  <link rel="stylesheet" href="/assets/css/integration.css?v=gambit1">
 </head>
 <body data-page="puzzles">
   <div id="site-header"></div>
@@ -18,7 +19,7 @@
       <div>
         <span class="eyebrow">Sharpen your eye</span>
         <h1>Puzzles that stick.</h1>
-        <p>One pattern at a time. Every puzzle is taken from a real game and rated to match your level.</p>
+        <p>One pattern at a time. Allenati su posizioni tattiche, con soluzioni verificate sul server.</p>
       </div>
       <div class="row gap-8">
         <button class="btn" data-puzzle-action="rush"><span data-icon="bolt"></span> Puzzle Rush</button>
@@ -29,23 +30,23 @@
     <div class="stat-cards">
       <div class="card stat-card">
         <span class="stat-ic"><span data-icon="target"></span></span>
-        <div><b id="puzzle-rating">2,108</b><span>Puzzle rating</span></div>
+        <div><b id="puzzle-rating">—</b><span>Puzzle rating</span></div>
         <span class="delta" id="rating-delta">+64 this week</span>
       </div>
       <div class="card stat-card">
         <span class="stat-ic gold"><span data-icon="flame"></span></span>
-        <div><b id="puzzle-streak">12 days</b><span>Current streak</span></div>
-        <span class="delta" style="color:var(--accent)">Personal best</span>
+        <div><b id="puzzle-streak">—</b><span>Current streak</span></div>
+        <span class="delta" style="color:var(--accent)">Giorni UTC</span>
       </div>
       <div class="card stat-card">
         <span class="stat-ic blue"><span data-icon="check"></span></span>
-        <div><b id="puzzle-solved">1,284</b><span>Puzzles solved</span></div>
-        <span class="delta">+86 this month</span>
+        <div><b id="puzzle-solved">—</b><span>Puzzles solved</span></div>
+        <span class="delta">Tempo medio: <b id="real-puzzle-time">—</b></span>
       </div>
       <div class="card stat-card">
         <span class="stat-ic red"><span data-icon="trend"></span></span>
-        <div><b>86%</b><span>Accuracy</span></div>
-        <span class="delta">Top 8% of players</span>
+        <div><b id="puzzle-accuracy">—</b><span>Precisione recente</span></div>
+        <span class="delta">Ultimi 100 tentativi</span>
       </div>
     </div>
 
@@ -63,7 +64,7 @@
         <div id="puzzle-board"></div>
 
         <div class="puzzle-actions">
-          <button class="btn btn-sm" data-puzzle-action="hint"><span data-icon="sparkles"></span> Hint</button>
+          <button class="btn btn-sm" data-puzzle-action="favorite" aria-label="Aggiungi o rimuovi preferito">☆</button><button class="btn btn-sm" data-puzzle-action="hint"><span data-icon="sparkles"></span> Hint</button>
           <button class="btn btn-sm" data-puzzle-action="solution"><span data-icon="eye"></span> Show solution</button>
           <button class="btn btn-sm btn-ghost" data-puzzle-action="reset"><span data-icon="refresh"></span> Retry</button>
           <div class="grow"></div>
@@ -102,7 +103,7 @@
             <span class="tiny strong" id="attempt-count">0</span>
           </div>
           <div class="row gap-6 mt-8" style="justify-content:space-between">
-            <span class="tiny muted">Your score for this puzzle</span>
+            <span class="tiny muted">Variazione Elo per questo puzzle</span>
             <span class="tiny strong" id="score-value">—</span>
           </div>
         </div>
@@ -115,7 +116,7 @@
           <p class="tiny muted">Solve one puzzle a day to keep the flame alive.</p>
           <div class="streak-days" id="streak-days"></div>
           <div class="row gap-6 mt-12" style="justify-content:space-between">
-            <span class="tiny muted">Longest streak</span><span class="tiny strong">27 days</span>
+            <span class="tiny muted">Serie migliore</span><span class="tiny strong" id="real-longest">—</span>
           </div>
         </div>
 
@@ -146,7 +147,7 @@
           <div class="course-body">
             <h3>Puzzle Rush</h3>
             <p>Solve as many puzzles as you can in three minutes. One wrong move ends the run.</p>
-            <div class="course-meta"><span>Best: 34 solved</span><button class="btn btn-sm btn-outline" data-puzzle-action="rush">Play</button></div>
+            <div class="course-meta"><span>Sessione di 3 minuti</span><button class="btn btn-sm btn-outline" data-puzzle-action="rush">Play</button></div>
           </div>
         </div>
         <div class="card course-card card-hover">
@@ -156,7 +157,7 @@
           <div class="course-body">
             <h3>Puzzle Battle</h3>
             <p>Race a player of similar rating through the same five puzzles. Fastest finger wins.</p>
-            <div class="course-meta"><span>1,204 in queue</span><button class="btn btn-sm btn-outline" data-puzzle-action="battle">Find match</button></div>
+            <div class="course-meta"><span>Sfida un amico</span><button class="btn btn-sm btn-outline" data-puzzle-action="battle">Find match</button></div>
           </div>
         </div>
         <div class="card course-card card-hover">
@@ -166,7 +167,7 @@
           <div class="course-body">
             <h3>Custom sets</h3>
             <p>Build a set around your weaknesses: forks, back-rank mates, endgame studies and more.</p>
-            <div class="course-meta"><span>18 themes</span><button class="btn btn-sm btn-outline" data-puzzle-action="custom">Create set</button></div>
+            <div class="course-meta"><span>Filtri salvati sul tuo account</span><button class="btn btn-sm btn-outline" data-puzzle-action="custom">Create set</button></div>
           </div>
         </div>
       </div>
@@ -201,10 +202,12 @@
     </div>
   </div>
 
-  <script src="assets/js/data.js?v=20261021b"></script>
-  <script src="assets/js/engine.js?v=20261021b"></script>
-  <script src="assets/js/app.js?v=20261021b"></script>
-  <script src="assets/js/board.js?v=20261021b"></script>
-  <script src="assets/js/puzzles.js?v=20261021b"></script>
+<script src="/assets/js/config.js?v=gambit1"></script>
+<script src="/assets/js/api.js?v=gambit1"></script>
+<script src="/assets/js/session.js?v=gambit1"></script>
+<script src="/assets/js/realtime.js?v=gambit1"></script>
+<script src="/assets/js/permissions.js?v=gambit1"></script>
+<script src="/assets/js/integration.js?v=gambit1"></script>
+<script src="/assets/js/boot.js?v=gambit1"></script>
 </body>
 </html>

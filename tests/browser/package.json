@@ -1,0 +1,12 @@
+{
+  "name": "gambit-browser-checks",
+  "private": true,
+  "scripts": {
+    "test": "node gambit-flows.cjs",
+    "smoke": "node gambit-smoke.cjs",
+    "responsive": "node gambit-responsive.cjs"
+  },
+  "devDependencies": {
+    "playwright": "1.56.1"
+  }
+}

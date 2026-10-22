@@ -9,6 +9,7 @@
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='24' fill='%2322c55e'/%3E%3Ctext x='50' y='78' font-size='70' text-anchor='middle'%3E%E2%99%9E%3C/text%3E%3C/svg%3E">
   <link rel="stylesheet" href="assets/css/base.css?v=20261021b">
   <link rel="stylesheet" href="assets/css/pages.css?v=20261021b">
+  <link rel="stylesheet" href="/assets/css/integration.css?v=gambit1">
 </head>
 <body data-page="learn">
   <div id="site-header"></div>
@@ -18,7 +19,7 @@
       <div>
         <span class="eyebrow">The Gambit academy</span>
         <h1>Learn the game. Keep the joy.</h1>
-        <p>Structured courses, short lessons and positions you can actually use. Built by coaches, tested by club players.</p>
+        <p>Structured courses, short lessons and positions you can actually use. Lezioni brevi con posizioni, spiegazioni e progressi personali.</p>
       </div>
       <div class="row gap-8">
         <button class="btn" id="study-plan-btn"><span data-icon="calendar"></span> Study plan</button>
@@ -30,7 +31,7 @@
       <div class="card learn-hero-main card-glow">
         <div>
           <span class="badge badge-green"><span data-icon="book"></span> Featured course</span>
-          <h2>The Complete Openings Bootcamp</h2>
+          <h2>The Complete Lezioni pubblicate</h2>
           <p>From first principles to a repertoire you trust. Twenty-four guided lessons covering the Italian, Sicilian, Queen's Gambit and the plans behind them.</p>
         </div>
         <div>
@@ -52,7 +53,7 @@
           <div class="grow">
             <span class="badge badge-gold" style="margin-bottom:6px">Up next</span>
             <h4>Two Knights: the Fried Liver</h4>
-            <p>18 min · Openings Bootcamp</p>
+            <p>18 min · Lezioni pubblicate</p>
             <div class="row gap-6 mt-8 tiny" style="color:var(--brand)"><span data-icon="play"></span> Resume lesson</div>
           </div>
         </div>
@@ -86,7 +87,7 @@
       <section class="card" style="overflow:hidden">
         <div class="widget-head" style="padding:17px 18px 12px">
           <h3 style="font-size:15px"><span data-icon="book"></span> Continue where you left off</h3>
-          <span class="tiny muted">Openings Bootcamp</span>
+          <span class="tiny muted">Lezioni pubblicate</span>
         </div>
         <div class="lesson-rows" id="lesson-rows"></div>
       </section>
@@ -98,12 +99,12 @@
         </div>
         <div class="card watch-cta" style="background:linear-gradient(120deg,var(--brand-soft),var(--surface) 70%)">
           <span class="stat-ic"><span data-icon="target"></span></span>
-          <div class="grow"><h4>Your weekly study plan</h4><p>2 of 4 sessions done · 38 minutes left this week</p></div>
-          <span class="ring" style="--p:50;--size:44px"><span>50%</span></span>
+          <div class="grow"><h4>Your weekly study plan</h4><p>Scegli le lezioni e riprendi dai tuoi progressi.</p></div>
+          <span class="ring" style="--p:50;--size:44px"><span>♟</span></span>
         </div>
         <div class="card side-card">
-          <div class="row" style="justify-content:space-between;margin-bottom:7px"><h3 style="font-size:13px">Daily endgame</h3><span class="badge badge-gold">+15 XP</span></div>
-          <p class="tiny muted" style="line-height:1.55">White to play. The rook belongs behind the passed pawn — can you convert?</p>
+          <div class="row" style="justify-content:space-between;margin-bottom:7px"><h3 style="font-size:13px">Daily endgame</h3><span class="badge badge-gold">Studio</span></div>
+          <p class="tiny muted" style="line-height:1.55">Muove il Bianco. Studia l’opposizione fra i re e proteggi il pedone.</p>
           <div class="mini-board-lg" id="daily-endgame" aria-label="Endgame study position"></div>
           <button class="btn btn-sm btn-outline btn-block mt-12" id="endgame-try">Try the study <span data-icon="arrowRight"></span></button>
         </div>
@@ -113,10 +114,12 @@
 
   <div id="site-footer"></div>
 
-  <script src="assets/js/data.js?v=20261021b"></script>
-  <script src="assets/js/engine.js?v=20261021b"></script>
-  <script src="assets/js/app.js?v=20261021b"></script>
-  <script src="assets/js/board.js?v=20261021b"></script>
-  <script src="assets/js/learn.js?v=20261021b"></script>
+<script src="/assets/js/config.js?v=gambit1"></script>
+<script src="/assets/js/api.js?v=gambit1"></script>
+<script src="/assets/js/session.js?v=gambit1"></script>
+<script src="/assets/js/realtime.js?v=gambit1"></script>
+<script src="/assets/js/permissions.js?v=gambit1"></script>
+<script src="/assets/js/integration.js?v=gambit1"></script>
+<script src="/assets/js/boot.js?v=gambit1"></script>
 </body>
 </html>

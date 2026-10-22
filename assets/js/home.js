@@ -1,61 +1,28 @@
-(function () {
-  'use strict';
-  const { $, icon, avatar, ratingFmt, toast, friends, settings } = window.Gambit;
-  const D = window.GAMBIT;
-
-  // hero board — a sharp Italian middlegame
-  new window.ChessBoard('#hero-board', {
-    fen: 'r1bq1rk1/ppp2ppp/2np1n2/2b1p3/2B1P3/2PP1N2/PP3PPP/RNBQR1K1 w - - 0 8',
-    orientation: 'white',
-    interactive: false,
-    boardTheme: settings.boardTheme,
-    last: { from: 'f1', to: 'e1' }
-  });
-
-  // daily puzzle preview
-  new window.ChessBoard('#daily-board', {
-    fen: D.puzzles[2].fen,
-    orientation: 'white',
-    interactive: false,
-    boardTheme: settings.boardTheme
-  });
-
-  // friends widget
-  const friendHost = $('#home-friends');
-  if (friendHost) {
-    friendHost.innerHTML = friends.slice(0, 5).map((f) => `
-      <div class="friend-row" data-friend-open="${f.id}">
-        <span style="position:relative">${avatar(f)}<span class="status-dot ${f.status}" style="position:absolute;bottom:0;right:0"></span></span>
-        <div class="friend-meta">
-          <div class="friend-name">${f.name} <span class="tiny muted">${f.flag}</span></div>
-          <div class="friend-sub">${f.status === 'playing' ? '<span style="color:var(--accent)">Playing</span> · ' : ''}${f.activity}</div>
-        </div>
-        <div class="friend-actions">
-          <button data-chat="${f.id}" aria-label="Message ${f.name}">${icon('message')}</button>
-          <button data-challenge="${f.id}" aria-label="Challenge ${f.name}" ${f.status === 'playing' ? 'disabled style="opacity:.35"' : ''}>${icon('sword')}</button>
-        </div>
-      </div>`).join('');
-  }
-
-  // leaderboard widget
-  const leaderHost = $('#home-leaders');
-  if (leaderHost) {
-    leaderHost.innerHTML = D.leaderboard.map((p) => `
-      <div class="leader-row">
-        <span class="leader-rank">${p.rank}</span>
-        ${avatar({ name: p.name, tone: p.tone })}
-        <span class="leader-name">${p.name} <span class="tiny muted">${p.flag}</span></span>
-        <span class="leader-rating">${ratingFmt(p.rating)}</span>
-      </div>`).join('');
-  }
-
-  // tournament quick join
-  document.addEventListener('click', (e) => {
-    const btn = e.target.closest('[data-join-tourney]');
-    if (!btn) return;
-    const name = btn.dataset.joinTourney;
-    btn.outerHTML = '<span class="badge badge-green">✓ Joined</span>';
-    toast(`You are registered for <b>${name}</b>. See you at the board!`, 'success', 'trophy');
-    window.Gambit.Sound.play('win');
-  });
+(function(){
+ 'use strict';const G=window.Gambit,A=window.GambitAPI,I=window.GambitIntegration,$=s=>document.querySelector(s),esc=G.esc;
+ function section(title,body,href,label){return '<section><div class="section-head"><div><h2>'+esc(title)+'</h2></div>'+(href?'<a class="link-more" href="'+href+'">'+esc(label||'Apri')+' →</a>':'')+'</div>'+body+'</section>';}
+ window.GambitPageReady=(async()=>{
+  const user=window.GambitSession.user;let games=[],courses=[],daily=null,stats=null,leaders=[];
+  if(user){const data=await Promise.allSettled([A.get('/lobby'),A.get('/platform/content/course'),A.get('/platform/puzzles/daily'),A.get('/platform/puzzles/progress'),A.get('/platform/leaderboards')]);games=data[0].status==='fulfilled'?data[0].value.games:[];courses=data[1].status==='fulfilled'?data[1].value.items:[];daily=data[2].status==='fulfilled'?data[2].value:null;stats=data[3].status==='fulfilled'?data[3].value:null;leaders=data[4].status==='fulfilled'?data[4].value.items:[];}
+  const active=games.find(g=>g.status==='active');let boardGame=null;if(active)boardGame=await A.get('/games/'+active.id);
+  const hero=$('#hero-board').closest('.match-card');hero.querySelector('.match-head').innerHTML='<span class="badge badge-green">'+(active?'La tua partita':'Una posizione da esplorare')+'</span><span class="small muted">'+(active?active.base/60+'+'+active.increment:'Scacchiera illustrativa')+'</span>';
+  const bars=hero.querySelectorAll('.player-bar');for(let i=0;i<2;i++){const name=active?(i?active.white_name:active.black_name):(i?'Bianco':'Nero');bars[i].querySelector('.avatar').textContent=G.initials(name);bars[i].querySelector('.player-name').textContent=name;bars[i].querySelector('.player-sub').textContent=active?'Partita in corso':'Posizione di esempio';bars[i].querySelector('.clock').textContent=active?Math.floor((active.clocks[i?1:0]||0)/60)+':'+String(Math.floor((active.clocks[i?1:0]||0)%60)).padStart(2,'0'):'—';}
+  hero.querySelector('.match-foot').innerHTML=active?'<a class="btn btn-sm btn-primary" href="/play.html?game='+esc(active.id)+'">Riprendi partita →</a>':'<span class="small muted">Stockfish 19 · analisi e partite reali</span>';
+  new window.ChessBoard('#hero-board',{fen:boardGame?.fen||'r1bq1rk1/ppp2ppp/2np1n2/2b1p3/2B1P3/2PP1N2/PP3PPP/RNBQR1K1 w - - 0 8',interactive:false});
+  $('.hero-trust').innerHTML=user?'<div class="avatar-stack">'+G.friends.slice(0,4).map(f=>G.avatar(f)).join('')+'</div><p><b>'+G.friends.filter(f=>f.online).length+' amici online</b><br>Il tuo spazio per giocare e migliorare</p>':'<p><b>Bot da 200 a 3190 Elo</b><br>Partite online, esercizi e analisi Stockfish</p>';
+  $('.float-chip.one').innerHTML=G.icon('flame')+'<span><span class="tiny">Puzzle</span>'+(stats?stats.streak+' giorni':'Una tattica alla volta')+'</span>';
+  $('.float-chip.two').innerHTML=G.icon('trend')+'<span><span class="tiny">Rapid</span>'+(user?user.ratings.rapid.rating+' Elo':'Gioca e migliora')+'</span>';
+  const main=$('.dash-main');main.innerHTML=section('Le tue partite',user?(games.length?'<div class="continue-grid">'+games.slice(0,4).map(g=>'<a class="continue-card card card-hover" href="/play.html?game='+esc(g.id)+'">'+G.icon('play')+'<div class="grow"><h4>'+esc(g.white_name)+' · '+esc(g.black_name)+'</h4><p>'+esc(g.status==='active'?'In corso':g.status==='waiting'?'In attesa':g.result)+' · '+g.base/60+'+'+g.increment+'</p></div></a>').join('')+'</div>':I.empty('La prima partita ti aspetta.','<a class="btn btn-primary" href="/play.html">Gioca</a>')):I.empty('Accedi per ritrovare partite, progressi e amici.','<button class="btn btn-primary" data-action="auth">Accedi o registrati</button>'),'/profile.html','Storico');
+  if(daily){main.innerHTML+=section('Puzzle del giorno','<div class="puzzle-banner card card-glow"><div id="daily-board"></div><div><span class="badge badge-green">'+esc(daily.theme)+' · '+daily.rating+'</span><h3>'+esc(daily.title)+'</h3><p>'+(daily.solved?'Già completato oggi. Puoi continuare ad allenarti.':'Trova la continuazione corretta. La soluzione resta sul server.')+'</p><div class="puzzle-nums"><div><b>'+stats.rating+'</b><span>Rating puzzle</span></div><div><b>'+stats.streak+'</b><span>Giorni consecutivi</span></div><div><b>'+stats.solved+'</b><span>Risolti</span></div></div><a class="btn btn-primary mt-16" href="/puzzles.html?id='+esc(daily.id)+'">Allenati →</a></div></div>','/puzzles.html','Allenamento');}
+  main.innerHTML+=section('Impara una mossa alla volta',courses.length?'<div class="continue-grid">'+courses.map(c=>'<a class="continue-card card card-hover" href="/learn.html?course='+esc(c.id)+'">'+G.icon('book')+'<div><h4>'+esc(c.title)+'</h4><p>'+esc(c.description||'Lezioni interattive')+'</p></div></a>').join('')+'</div>':I.empty(user?'I corsi pubblicati appariranno qui.':'Lezioni interattive, posizioni reali e progressi sul tuo account.'),'/learn.html','Corsi');
+  if(daily)new window.ChessBoard('#daily-board',{fen:daily.fen,interactive:false});
+  const side=$('.profile-mini');side.innerHTML=user?'<div class="profile-mini-top">'+G.avatar(G.user,'avatar lg')+'<div><h3>'+esc(G.user.name)+'</h3><span class="handle">'+esc(G.user.handle)+'</span></div></div><div class="profile-mini-stats">'+[['Rapid',user.ratings.rapid.rating],['Blitz',user.ratings.blitz.rating],['Puzzle',stats?.rating||1200]].map(([n,v])=>'<div><b>'+v+'</b><span>'+n+'</span></div>').join('')+'</div><a class="btn btn-sm btn-block mt-16" href="/profile.html">Il mio profilo</a>':I.empty('Benvenuto nel club.','<button class="btn btn-primary" data-action="auth" data-auth="signup">Crea un account</button>');
+  $('#home-friends').innerHTML=G.friends.length?G.friends.slice(0,5).map(f=>'<div class="friend-row">'+G.avatar(f)+'<div class="grow"><b>'+esc(f.name)+'</b><p class="tiny muted">'+(f.online?'Online':'Offline')+'</p></div><button class="icon-btn" data-challenge="'+esc(f.id)+'" aria-label="Sfida '+esc(f.name)+'">'+G.icon('sword')+'</button></div>').join(''):I.empty('Invita un amico con il tuo codice.','<button class="btn btn-sm" data-action="invite-friend">Aggiungi amico</button>');
+  const fcount=$('#home-friends').closest('.card').querySelector('.count');if(fcount)fcount.textContent=G.friends.filter(f=>f.online).length;
+  $('#home-leaders').innerHTML=leaders.length?leaders.map((p,i)=>'<div class="leader-row"><span class="leader-rank">'+(i+1)+'</span>'+G.avatar(p)+'<span class="leader-name">'+esc(p.name)+'</span><span class="leader-rating">'+p.rating+'</span></div>').join(''):I.empty('La classifica è visibile fra amici.');
+  $('#home-leaders').closest('.card').querySelector('.widget-head h3').textContent='Classifica fra amici';$('#home-leaders').closest('.card').querySelector('.widget-foot')?.remove();
+  document.querySelectorAll('.dash-side > .card').forEach(el=>{if(/Gambit Plus|Upgrade|unlimited/i.test(el.textContent))el.remove();});
+  const goal=$('#real-training-goal');if(goal)goal.innerHTML='<span class="badge badge-green">Allenamento personale</span><h3 class="mt-12">Una tattica alla volta</h3><p class="small muted">'+(stats?stats.solved+' puzzle risolti dal tuo account.':'Accedi per salvare i progressi.')+'</p><a class="btn btn-sm btn-primary btn-block mt-16" href="/puzzles.html">Allenati →</a>';
+  G.hydrateIcons();
+ })();
 })();
