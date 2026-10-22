@@ -1,0 +1,77 @@
+{
+  "capture.mp3": {
+    "source": "https://images.chesscomfiles.com/chess-themes/sounds/_MP3_/default/capture.mp3",
+    "sha256": "7158a77f3eb9a763fe723e9c9291819de8748444a1192d10383159fd8175709b",
+    "bytes": 6889
+  },
+  "castle.mp3": {
+    "source": "https://images.chesscomfiles.com/chess-themes/sounds/_MP3_/default/castle.mp3",
+    "sha256": "da05719e6b3f0d04a2ac1a551e643ab14f4e840ae3b9410c0ea15ba4bcac5010",
+    "bytes": 5353
+  },
+  "game-draw.mp3": {
+    "source": "https://images.chesscomfiles.com/chess-themes/sounds/_MP3_/default/game-draw.mp3",
+    "sha256": "5b315c149bd726bf6e0873687f28c09ba5c7bc0cf925d65e74418425ff5d5e65",
+    "bytes": 2531
+  },
+  "game-end.mp3": {
+    "source": "https://images.chesscomfiles.com/chess-themes/sounds/_MP3_/default/game-end.mp3",
+    "sha256": "9b53d24c925bcc96b05ca4808ff1198293f0bb3422176927cef5d3a10c4c9023",
+    "bytes": 5353
+  },
+  "game-lose.mp3": {
+    "source": "https://images.chesscomfiles.com/chess-themes/sounds/_MP3_/default/game-lose.mp3",
+    "sha256": "902596c14986bbbf53c0387570d6d547d7c76c8fa2df5a0f73d4770af6a09a2a",
+    "bytes": 3726
+  },
+  "game-start.mp3": {
+    "source": "https://images.chesscomfiles.com/chess-themes/sounds/_MP3_/default/game-start.mp3",
+    "sha256": "cdb01ddc68a1406abd065597ec604053dd9ea8e20636f27d41a6fe1d6b1a835d",
+    "bytes": 5353
+  },
+  "game-win-long.mp3": {
+    "source": "https://images.chesscomfiles.com/chess-themes/sounds/_MP3_/default/game-win-long.mp3",
+    "sha256": "8263fd48cf39d2d840ad887cecdfe59dc5d03ab1b209356df2b8e6193eb6ee84",
+    "bytes": 4252
+  },
+  "illegal.mp3": {
+    "source": "https://images.chesscomfiles.com/chess-themes/sounds/_MP3_/default/illegal.mp3",
+    "sha256": "3224eb7a6d93e52229ddcb49c62e584764d1474c123d25c91ecb2c74aa6291f9",
+    "bytes": 4585
+  },
+  "move-check.mp3": {
+    "source": "https://images.chesscomfiles.com/chess-themes/sounds/_MP3_/default/move-check.mp3",
+    "sha256": "ef4764a74d19d0db1659e413e8afadc25f1e8cfba83a4a76e6e64f28f3077d52",
+    "bytes": 6121
+  },
+  "move-opponent.mp3": {
+    "source": "https://images.chesscomfiles.com/chess-themes/sounds/_MP3_/default/move-opponent.mp3",
+    "sha256": "0931855637e50e4edbc7916ec7a66cca2f0eee763e1c791ff774a9945517ea61",
+    "bytes": 3433
+  },
+  "move-self.mp3": {
+    "source": "https://images.chesscomfiles.com/chess-themes/sounds/_MP3_/default/move-self.mp3",
+    "sha256": "3a2eb75af1334c06dafd735c23388a560285e0df9436a44d27adc95a010a8547",
+    "bytes": 3433
+  },
+  "notify.mp3": {
+    "source": "https://images.chesscomfiles.com/chess-themes/sounds/_MP3_/default/notify.mp3",
+    "sha256": "5cfab87e94b55e1e51f0ac13856e6ba223e2fda6d2f4dd43f7b7e995ab393007",
+    "bytes": 3817
+  },
+  "premove.mp3": {
+    "source": "https://images.chesscomfiles.com/chess-themes/sounds/_MP3_/default/premove.mp3",
+    "sha256": "7d1057ba9537f92d20214028e6dd7e82f4c9c9fb607c6eb55e6f8cdc641f89af",
+    "bytes": 4201
+  },
+  "promote.mp3": {
+    "source": "https://images.chesscomfiles.com/chess-themes/sounds/_MP3_/default/promote.mp3",
+    "sha256": "69219212aa2dce6031d6a641f8813779809bdff33562a8418d8e003eea465815",
+    "bytes": 4969
+  },
+  "tenseconds.mp3": {
+    "source": "https://images.chesscomfiles.com/chess-themes/sounds/_MP3_/default/tenseconds.mp3",
+    "sha256": "797b878fc67d1c368c661c5e78511edc0796b5aba2e959204213a9547ba1d277",
+    "bytes": 10729
+  }
+}

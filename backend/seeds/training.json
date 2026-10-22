@@ -1,0 +1,158 @@
+[
+  {
+    "id": "starter-p1",
+    "kind": "puzzle",
+    "title": "Back-rank finish",
+    "data": {
+      "fen": "6k1/5ppp/8/8/8/8/5PPP/3R2K1 w - - 0 1",
+      "solution": [
+        "d1d8"
+      ],
+      "hint": "The eighth rank is completely undefended. Bring the heavy piece.",
+      "explanation": "Rd8# — the king is boxed in by its own pawns.",
+      "rating": 860,
+      "theme": "Back-rank mate"
+    }
+  },
+  {
+    "id": "starter-p2",
+    "kind": "puzzle",
+    "title": "Smothered mate",
+    "data": {
+      "fen": "6rk/6pp/8/6N1/8/8/8/6K1 w - - 0 1",
+      "solution": [
+        "g5f7"
+      ],
+      "hint": "The knight can deliver check from a square no one can capture.",
+      "explanation": "Nf7# — the king suffocates behind its own pieces.",
+      "rating": 1120,
+      "theme": "Mate in 1"
+    }
+  },
+  {
+    "id": "starter-p3",
+    "kind": "puzzle",
+    "title": "Scholar's finish",
+    "data": {
+      "fen": "r1bqkb1r/pppp1ppp/2n2n2/4p2Q/2B1P3/8/PPPP1PPP/RNB1K1NR w KQkq - 4 4",
+      "solution": [
+        "h5f7"
+      ],
+      "hint": "Two attackers are already pointed at the weakest square.",
+      "explanation": "Qxf7# — the bishop on c4 covers the escape square.",
+      "rating": 980,
+      "theme": "Mate in 1"
+    }
+  },
+  {
+    "id": "starter-p4",
+    "kind": "puzzle",
+    "title": "Royal fork",
+    "data": {
+      "fen": "r3k3/7p/4N3/8/8/8/8/4K3 w - - 0 1",
+      "solution": [
+        "e6c7",
+        "e8d8",
+        "c7a8"
+      ],
+      "hint": "Find the square where the knight touches both the king and the rook.",
+      "explanation": "Nc7+ forks king and rook. After the king moves, Nxa8 wins the rook.",
+      "rating": 1340,
+      "theme": "Knight fork"
+    }
+  },
+  {
+    "id": "starter-p5",
+    "kind": "puzzle",
+    "title": "Skewer the queen",
+    "data": {
+      "fen": "k7/q7/8/8/8/8/8/R3K1B1 w - - 0 1",
+      "solution": [
+        "a1a7"
+      ],
+      "hint": "The bishop on g1 guards a long diagonal. The queen is not as safe as it looks.",
+      "explanation": "Rxa7+ wins the queen — the bishop covers the king's recapture.",
+      "rating": 1210,
+      "theme": "Skewer"
+    }
+  },
+  {
+    "id": "starter-p6",
+    "kind": "puzzle",
+    "title": "Fork the queen",
+    "data": {
+      "fen": "4k3/8/4N3/3q4/8/8/8/4K3 w - - 0 1",
+      "solution": [
+        "e6c7",
+        "e8d8",
+        "c7d5"
+      ],
+      "hint": "The queen on d5 is attacking your knight. Move it somewhere useful.",
+      "explanation": "Nc7+ forks king and queen. After the king steps aside, Nxd5.",
+      "rating": 1460,
+      "theme": "Knight fork"
+    }
+  },
+  {
+    "id": "starter-foundations",
+    "kind": "course",
+    "title": "I primi passi sulla scacchiera",
+    "data": {
+      "description": "Tre lezioni interattive: centro, sviluppo e sicurezza del re.",
+      "level": "Beginner",
+      "duration": 15
+    }
+  },
+  {
+    "id": "starter-centre",
+    "kind": "lesson",
+    "parent": "starter-foundations",
+    "title": "Occupare il centro",
+    "data": {
+      "text": "I pedoni centrali controllano case importanti e aprono linee ad alfieri e donna. Muovi e4, osserva la risposta e5 e sviluppa il cavallo con Cf3. Il cavallo attacca e5 e prepara il controllo di d4.",
+      "fen": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+      "moves": [
+        "e2e4",
+        "e7e5",
+        "g1f3"
+      ],
+      "order": 1,
+      "chapter": "Apertura"
+    }
+  },
+  {
+    "id": "starter-development",
+    "kind": "lesson",
+    "parent": "starter-foundations",
+    "title": "Sviluppare i pezzi",
+    "data": {
+      "text": "Nella Partita Italiana il Bianco sviluppa cavallo e alfiere, poi mette il re al sicuro. Segui e4 e5, Cf3 Cc6, Ac4 Ac5. Ogni mossa porta un nuovo pezzo in gioco e mantiene il controllo del centro.",
+      "fen": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+      "moves": [
+        "e2e4",
+        "e7e5",
+        "g1f3",
+        "b8c6",
+        "f1c4",
+        "f8c5"
+      ],
+      "order": 2,
+      "chapter": "Apertura"
+    }
+  },
+  {
+    "id": "starter-castling",
+    "kind": "lesson",
+    "parent": "starter-foundations",
+    "title": "Arroccare in sicurezza",
+    "data": {
+      "text": "L’arrocco sposta insieme re e torre. Il re passa da e1 a g1 e la torre da h1 a f1. È legale solo se re e torre non si sono mossi, il percorso è libero e il re non attraversa case attaccate. Concludi lo sviluppo e arrocca corto.",
+      "fen": "r1bqk1nr/pppp1ppp/2n5/2b1p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 4 4",
+      "moves": [
+        "e1g1"
+      ],
+      "order": 3,
+      "chapter": "Sicurezza del re"
+    }
+  }
+]

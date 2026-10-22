@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#111a21">
+<title>Aura Chess — il tuo club di scacchi</title>
+<meta name="description" content="Il tuo piccolo club di scacchi: sfida Stockfish, gioca con gli amici e impara dalle tue partite.">
+<link rel="icon" href="/pieces/wN.svg" type="image/svg+xml"><link rel="stylesheet" href="/style.css?v=public1"><script type="module" src="/app.js?v=public1"></script>
+</head>
+<body>
+<aside class="sidebar">
+<a class="brand" href="/" aria-label="Scacchi Club, home"><span class="brand-mark">♞</span><span>aura<span class="brand-sub">CHESS CLUB</span></span></a>
+<div class="nav-caption">IL TUO SPAZIO</div>
+<nav aria-label="Menu principale"><button data-nav="play" class="nav"><span>⚔</span>Gioca online</button><button data-nav="bot" class="nav active"><span>♟</span>Gioca con un bot</button><button data-nav="friend" class="nav"><span>♧</span>Amici <span id="friends-badge" class="nav-badge" hidden>0</span></button><button data-nav="archive" class="nav"><span>▤</span>Le tue partite</button><button data-nav="accounts" class="nav" id="invites-nav" hidden><span>♔</span>Account</button><button data-nav="themes" class="nav"><span>◈</span>Aspetto</button></nav>
+<div class="side-tip"><span class="tiny-label">UNA MOSSA ALLA VOLTA</span><p>Ogni partita è un’occasione per vedere qualcosa di nuovo.</p><div class="tip-rule"></div><small>Gioca. Rivedi. Migliora.</small></div>
+<div class="profile"><span class="avatar" id="avatar">?</span><div><strong id="profile-name">Il tuo club</strong><small id="profile-caption">Accedi al tuo account</small></div><button class="icon-btn" id="profile-button" title="Il tuo account" aria-label="Il tuo account">⋯</button></div>
+</aside>
+<div class="shell">
+<header class="topbar"><span class="breadcrumb">IL CLUB <span>/</span> <strong id="breadcrumb-current">GIOCA</strong></span><button class="quiet-btn inbox-button" data-action="show-inbox">♧ Sfide <span id="challenge-count" hidden>0</span></button><div class="engine-status"><span class="status-dot"></span><span id="server-status">Connessione…</span></div></header>
+<main>
+<section class="page-heading"><div><div class="eyebrow">IL PIACERE DI GIOCARE, LO SPAZIO PER IMPARARE</div><h1 id="page-title">La prossima mossa è tua<span>.</span></h1><p id="page-description">Un avversario alla tua altezza. Una nuova idea a ogni partita.</p></div><button class="quiet-btn" id="import-button">↥ Importa PGN</button></section>
+<section class="workspace">
+<div class="board-column">
+<div class="player-bar"><div class="player-info"><span class="avatar opponent-avatar" id="opponent-avatar">♞</span><div><strong id="opponent-name">Stockfish</strong><small id="opponent-detail">Scegli il tuo avversario</small><div class="captured-pieces" id="top-material"></div></div></div><div class="clock" id="top-clock">10:00</div></div>
+<div id="history-banner" class="history-banner" hidden><span id="history-caption"></span><button class="quiet-btn" data-action="return-live">Torna alla partita →</button></div><div class="board-wrap"><div class="eval-bar" id="eval-bar" title="Valutazione dal punto di vista del Bianco"><div id="eval-white"></div></div><div class="board-frame"><div id="board" class="board" role="group" aria-label="Scacchiera"></div><svg id="user-annotations" viewBox="0 0 800 800" aria-hidden="true"></svg><svg id="board-arrow" viewBox="0 0 800 800" aria-hidden="true"><defs><marker id="arrowhead" markerWidth="4" markerHeight="4" refX="2.2" refY="2" orient="auto"><path d="M0,0 L4,2 L0,4 Z" fill="#21b99a"/></marker></defs><line id="arrow-line" marker-end="url(#arrowhead)"/></svg></div></div>
+<div class="player-bar bottom-player"><div class="player-info"><span class="avatar you-avatar" id="you-avatar">TU</span><div><strong id="you-name">Tu</strong><small id="you-detail">Bianco · pronto a giocare</small><div class="captured-pieces" id="bottom-material"></div></div></div><div class="clock own-clock" id="bottom-clock">10:00</div></div>
+<div class="board-tools"><div class="game-status" id="game-status"><span class="status-dot muted"></span>La scacchiera ti aspetta</div><div><button class="icon-btn" id="flip-button" title="Ruota scacchiera" aria-label="Ruota scacchiera">⇅</button><button class="icon-btn" id="sound-button" title="Attiva suoni" aria-label="Attiva suoni">♪</button><button class="icon-btn" id="download-button" title="Scarica PGN" aria-label="Scarica PGN">⇩</button></div></div>
+<p class="board-hint">Destro + trascina: frecce · clic destro: annulla premosse <button data-action="clear-annotations" title="Cancella frecce e cerchi">Cancella segni</button></p><div id="premove-bar" class="premove-bar" hidden></div><div class="game-actions" id="game-actions"></div>
+<div class="review-controls" id="review-controls" hidden><button class="quiet-btn" id="review-first" title="Posizione iniziale" aria-label="Prima posizione">⇤</button><button class="quiet-btn" id="review-prev" aria-label="Mossa precedente">←</button><span id="review-position">Posizione iniziale</span><button class="quiet-btn" id="review-next" aria-label="Mossa successiva">→</button><button class="quiet-btn" id="review-last" title="Ultima posizione" aria-label="Ultima posizione">⇥</button><button class="quiet-btn" id="review-live">● Live</button></div>
+</div>
+<aside class="panel" id="panel"></aside>
+</section>
+<section class="bottom-note"><span>♜</span><div><strong>Un piccolo club, grandi partite.</strong><p>Stockfish 19 per le sfide e le analisi. Un link per invitare un amico.</p></div><a href="/about.html" target="_blank" rel="noopener">Come funziona ↗</a></section>
+</main>
+<footer><span>AURA CHESS</span><span><a href="/privacy.html" target="_blank" rel="noopener">Privacy e sicurezza</a> · Una mossa alla volta.</span></footer>
+</div>
+<dialog id="modal"><button class="modal-close icon-btn" id="modal-close" aria-label="Chiudi">×</button><div id="modal-content"></div></dialog>
+<div id="challenge-popups" class="challenge-popups" aria-live="polite"></div><input type="file" id="theme-file" accept="application/json,.json" hidden><div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+</body></html>

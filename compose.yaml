@@ -1,0 +1,31 @@
+services:
+  scacchi:
+    build: .
+    container_name: scacchi-club
+    restart: unless-stopped
+    init: true
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=128m,mode=1777
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    ports:
+      - "127.0.0.1:8095:8000"
+    volumes:
+      - chess-data:/data
+    cpus: 2.0
+    mem_limit: 1536m
+    pids_limit: 128
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    environment:
+      PYTHONDONTWRITEBYTECODE: "1"
+      COOKIE_SECURE: "1"
+      PUBLIC_URL: "https://chess.aura-server.org"
+volumes:
+  chess-data:

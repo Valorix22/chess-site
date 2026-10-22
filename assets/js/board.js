@@ -28,6 +28,7 @@
       this.chess = new window.Chess(this.opts.fen);
       this.selected = null;
       this.legal = [];
+      this.annotations = [];
       this.last = this.opts.last;
       this.checkSq = this.opts.check;
       this.flipped = this.opts.orientation === 'black';
@@ -69,82 +70,64 @@
 
     render() {
       if (!this.el) return;
-      const boardTheme = this.opts.boardTheme || (window.Gambit ? window.Gambit.settings.boardTheme : 'green');
-      const coords = settings().coordinates;
-
-      if (!this.el.querySelector('.board-wrap')) {
-        this.el.innerHTML = '<div class="board-wrap"><div class="board playable" role="grid" aria-label="Chess board"></div></div>';
-      }
-      const oldPop = this.el.querySelector('.promo-pop');
-      if (oldPop) oldPop.remove();
-      const wrap = this.el.querySelector('.board-wrap');
-      const board = this.el.querySelector('.board');
-      wrap.dataset.board = boardTheme;
-      board.classList.toggle('playable', !this.disabled);
-      board.innerHTML = '';
-
-      const isLegalTarget = (i) => this.legal.includes(i);
-      const order = this._order();
-
-      order.forEach((i) => {
-        const f = i % 8, r = Math.floor(i / 8);
-        const name = sqName(i);
-        const piece = this.chess.board[i];
-        const sq = document.createElement('div');
-        sq.className = 'sq ' + ((f + r) % 2 === 0 ? 'light' : 'dark');
-        sq.dataset.square = name;
-        sq.setAttribute('role', 'gridcell');
-        sq.setAttribute('aria-label', name + (piece ? ' ' + (piece[0] === 'w' ? 'white ' : 'black ') + piece[1] : ''));
-
-        if (this.last && (this.last.from === name || this.last.to === name)) sq.classList.add('last');
-        if (this.checkSq === name) sq.classList.add('check');
-        if (this.selected === name) sq.classList.add('selected');
-        if (isLegalTarget(i)) {
-          const hint = document.createElement('span');
-          hint.className = 'hint' + (piece ? ' capture' : '');
-          sq.appendChild(hint);
+      if(!this.el.querySelector('.board-wrap'))this.el.innerHTML='<div class="board-wrap"><div class="board playable" role="grid" aria-label="Scacchiera"></div><svg class="draw-overlay" viewBox="0 0 800 800" aria-hidden="true"></svg></div>';
+      const wrap=this.el.querySelector('.board-wrap'),board=this.el.querySelector('.board');
+      wrap.dataset.board=this.opts.boardTheme||(window.Gambit?window.Gambit.settings.boardTheme:'green');
+      board.classList.toggle('playable',!this.disabled);
+      const old=Array.from(board.querySelectorAll('.piece')).map(node=>({node,code:node.dataset.code,square:node.parentElement.dataset.square,rect:node.getBoundingClientRect()})),used=new Set();
+      const desired=new Map(this.chess.board.map((p,i)=>[sqName(i),p]));
+      const order=this._order();
+      order.forEach((i,index)=>{
+        const name=sqName(i),piece=this.chess.board[i];let cell=board.querySelector('[data-square="'+name+'"]');
+        if(!cell){
+          cell=document.createElement('div');cell.dataset.square=name;cell.setAttribute('role','gridcell');
+          cell.addEventListener('click',event=>{event.preventDefault();this._onSquare(name,this.chess.board[nameToIdx(name)]);});
+          cell.addEventListener('dragover',event=>this._onDragOver(event,name));cell.addEventListener('dragleave',()=>cell.classList.remove('drop-target'));cell.addEventListener('drop',event=>this._onDrop(event,name));
         }
-        if (coords) {
-          const bottomRow = this.flipped ? r === 0 : r === 7;
-          const leftCol = this.flipped ? f === 7 : f === 0;
-          if (bottomRow) {
-            const cf = document.createElement('span');
-            cf.className = 'coord-file';
-            cf.textContent = FILES[f];
-            sq.appendChild(cf);
-          }
-          if (leftCol) {
-            const cr = document.createElement('span');
-            cr.className = 'coord-rank';
-            cr.textContent = 8 - r;
-            sq.appendChild(cr);
+        cell.className='sq '+((i%8+Math.floor(i/8))%2===0?'light':'dark');cell.tabIndex=index===0?0:-1;
+        cell.setAttribute('aria-label',name+(piece?' '+(piece[0]==='w'?'Bianco ':'Nero ')+piece[1]:''));
+        cell.classList.toggle('last',!!this.last&&(this.last.from===name||this.last.to===name));cell.classList.toggle('check',this.checkSq===name);cell.classList.toggle('selected',this.selected===name);
+        cell.classList.toggle('premove',!!this.opts.premoveSquares?.includes(name));
+        cell.querySelectorAll('.hint,.coord-file,.coord-rank,.king-marker').forEach(node=>node.remove());
+        if(this.legal.includes(i)){const hint=document.createElement('span');hint.className='hint'+(piece?' capture':'');cell.append(hint);}
+        if(settings().coordinates){
+          if(index>=56){const coord=document.createElement('span');coord.className='coord-file';coord.textContent=name[0];cell.append(coord);}
+          if(index%8===0){const coord=document.createElement('span');coord.className='coord-rank';coord.textContent=name[1];cell.append(coord);}
+        }
+        if(piece){
+          let found=old.find(v=>!used.has(v.node)&&v.square===name&&v.code===piece);
+          if(!found)found=old.filter(v=>!used.has(v.node)&&v.code===piece&&desired.get(v.square)!==v.code).sort((a,b)=>Math.hypot(nameToIdx(a.square)%8-i%8,Math.floor(nameToIdx(a.square)/8)-Math.floor(i/8))-Math.hypot(nameToIdx(b.square)%8-i%8,Math.floor(nameToIdx(b.square)/8)-Math.floor(i/8)))[0];
+          const node=found?.node||document.createElement('span');node.className='piece '+piece[0];node.dataset.code=piece;node.dataset.from=name;
+          if(!found){node.innerHTML='<img src="/pieces/'+piece+'.svg" alt="" draggable="false">';node.addEventListener('dragstart',ev=>{this._onDragStart(ev,node.dataset.from);node.classList.add('dragging');});node.addEventListener('dragend',()=>{node.classList.remove('dragging');this._clearDropTargets();});}
+          used.add(node);node.draggable=!this.disabled&&piece[0]===(this.opts.playerColor||this.chess.turn);cell.classList.toggle('draggable',node.draggable);cell.append(node);
+          if(found&&found.square!==name&&settings().animations&&this._previousFlipped===this.flipped){requestAnimationFrame(()=>{const rect=node.getBoundingClientRect();if(!rect.width||!found.rect.width)return;node.getAnimations().forEach(a=>a.cancel());node.animate([{transform:'translate('+(found.rect.left-rect.left)+'px,'+(found.rect.top-rect.top)+'px)'},{transform:'translate(0,0)'}],{duration:this.opts.fast?80:145,easing:'cubic-bezier(.2,.8,.2,1)'});});}
+          if(piece[1]==='K'&&this.opts.result&&this.opts.result!=='*'){
+            const marker=document.createElement('span');const won=this.opts.result===(piece[0]==='w'?'1-0':'0-1');marker.className='king-marker '+(this.opts.result==='1/2-1/2'?'draw':won?'win':'loss');marker.textContent=this.opts.result==='1/2-1/2'?'½':won?'✓':'×';cell.append(marker);
           }
         }
-        if (piece) {
-          const span = document.createElement('span');
-          span.className = 'piece ' + piece[0];
-          span.textContent = GLYPHS[piece[1]];
-          span.dataset.from = name;
-          if (!this.disabled && piece[0] === this.chess.turn) {
-            span.setAttribute('draggable', 'true');
-            sq.classList.add('draggable');
-            span.addEventListener('dragstart', (ev) => this._onDragStart(ev, name));
-            span.addEventListener('dragend', () => this._clearDropTargets());
-          }
-          sq.appendChild(span);
-        }
-
-        sq.addEventListener('click', (ev) => { ev.preventDefault(); this._onSquare(name, piece); });
-        sq.addEventListener('dragover', (ev) => this._onDragOver(ev, name));
-        sq.addEventListener('dragleave', () => sq.classList.remove('drop-target'));
-        sq.addEventListener('drop', (ev) => this._onDrop(ev, name));
-        board.appendChild(sq);
+        board.append(cell);
       });
+      for(const previous of old)if(!used.has(previous.node))previous.node.remove();
+      this._previousFlipped=this.flipped;
+      if(!this._eventsBound){
+        this._eventsBound=true;wrap.addEventListener('contextmenu',event=>event.preventDefault());let start=null;
+        board.addEventListener('pointerdown',event=>{if(event.button===2){start=event.target.closest('[data-square]')?.dataset.square;event.preventDefault();}});
+        board.addEventListener('pointerup',event=>{if(event.button!==2)return;const end=event.target.closest('[data-square]')?.dataset.square;if(start&&end&&start!==end){const key=start+end,index=this.annotations.findIndex(a=>a.from+a.to===key);if(index>=0)this.annotations.splice(index,1);else this.annotations.push({from:start,to:end});if(this.annotations.length>32)this.annotations.shift();}else{this.opts.onCancelPremoves?.();}start=null;this.renderAnnotations();});
+        board.addEventListener('keydown',event=>{const cell=event.target.closest('[data-square]');if(!cell)return;const order=this._order(),index=order.indexOf(nameToIdx(cell.dataset.square)),delta={ArrowLeft:-1,ArrowRight:1,ArrowUp:-8,ArrowDown:8}[event.key];if(delta){event.preventDefault();const i=Math.min(63,Math.max(0,index+delta));const next=board.querySelector('[data-square="'+sqName(order[i])+'"]');cell.tabIndex=-1;next.tabIndex=0;next.focus();}else if(event.key==='Enter'||event.key===' '){event.preventDefault();this._onSquare(cell.dataset.square,this.chess.board[nameToIdx(cell.dataset.square)]);}else if(event.key==='Escape'){this.clearSelection();this.opts.onCancelPremoves?.();}});
+      }
+      this.renderAnnotations();
+    }
+
+    renderAnnotations(){
+      const svg=this.el.querySelector('.draw-overlay');if(!svg)return;const grid=this.el.querySelector('.board');svg.style.left=grid.offsetLeft+'px';svg.style.top=grid.offsetTop+'px';svg.style.width=grid.clientWidth+'px';svg.style.height=grid.clientHeight+'px';
+      const coordinate=square=>{const i=this._order().indexOf(nameToIdx(square));return [i%8*100+50,Math.floor(i/8)*100+50];};
+      const arrows=[...this.annotations,...(this.opts.bestArrow?[this.opts.bestArrow]:[])];
+      svg.innerHTML='<defs><marker id="arrow-'+this.el.id+'" markerWidth="3" markerHeight="3" refX="2.3" refY="1.5" orient="auto"><path d="M0 0 L3 1.5 L0 3 Z" fill="context-stroke"/></marker></defs>'+arrows.map(a=>'<path d="'+window.BoardTools.annotationPath(a.from,a.to,coordinate)+'" fill="none" stroke="'+(a.best?'#4ade80':'#efa639')+'" stroke-width="13" stroke-linecap="round" stroke-linejoin="round" opacity=".8" marker-end="url(#arrow-'+this.el.id+')"/>').join('');
     }
 
     _onSquare(name, piece) {
       if (this.disabled || this.pendingPromo) return;
-      const turn = this.chess.turn;
+      const turn = this.opts.playerColor || this.chess.turn;
 
       if (this.selected) {
         if (name === this.selected) { this.clearSelection(); return; }
@@ -159,12 +142,13 @@
     _select(name) {
       this.selected = name;
       const from = nameToIdx(name);
-      this.legal = this.chess.legalMovesFrom(from).map((m) => m.to);
+      this.legal = this.opts.allowPremove ? Array.from({length:64},(_,i)=>i).filter(i=>window.BoardTools.canPremove(this.opts.premoveMap,name,sqName(i),this.opts.playerColor==='w',this.opts.premoveRights)) : this.chess.legalMovesFrom(from).map((m) => m.to);
       this.render();
       if (this.opts.onSelect) this.opts.onSelect(name);
     }
 
     _tryMove(from, to) {
+      if(this.opts.allowPremove){if(!window.BoardTools.canPremove(this.opts.premoveMap,from,to,this.opts.playerColor==='w',this.opts.premoveRights))return false;const p=this.opts.premoveMap[from];if(p.toLowerCase()==='p'&&['1','8'].includes(to[1]))this._openPromotion(from,to);else this._emitMove(from,to,null);return true;}
       const fromIdx = nameToIdx(from);
       const toIdx = nameToIdx(to);
       const candidates = this.chess.legalMoves().filter((m) => m.from === fromIdx && m.to === toIdx);
@@ -194,10 +178,10 @@
       this.pendingPromo = { from, to };
       this.render();
       const wrap = this.el.querySelector('.board-wrap');
-      const color = this.chess.turn;
+      const color = this.opts.playerColor || this.chess.turn;
       const pop = document.createElement('div');
       pop.className = 'promo-pop';
-      pop.innerHTML = `<div class="promo-pop-label">Promote to</div><div class="promo-grid">${['Q', 'R', 'B', 'N'].map((t) => `<button class="promo-piece ${color}" data-promo="${t}" aria-label="${t}">${GLYPHS[t]}</button>`).join('')}</div>`;
+      pop.innerHTML = `<div class="promo-pop-label">Promote to</div><div class="promo-grid">${['Q', 'R', 'B', 'N'].map((t) => `<button class="promo-piece ${color}" data-promo="${t}" aria-label="${t}">${window.GambitIntegration.piece(color+t)}</button>`).join('')}</div>`;
       wrap.appendChild(pop);
       pop.addEventListener('click', (e) => {
         const btn = e.target.closest('[data-promo]');
@@ -211,11 +195,11 @@
     }
 
     _onDragStart(ev, from) {
-      if (this.disabled) { ev.preventDefault(); return; }
+      if (this.disabled || this.chess.board[nameToIdx(from)]?.[0] !== (this.opts.playerColor||this.chess.turn)) { ev.preventDefault(); return; }
       ev.dataTransfer.setData('text/plain', from);
       ev.dataTransfer.effectAllowed = 'move';
       this.selected = from;
-      this.legal = this.chess.legalMovesFrom(nameToIdx(from)).map((m) => m.to);
+      this.legal = this.opts.allowPremove ? Array.from({length:64},(_,i)=>i).filter(i=>window.BoardTools.canPremove(this.opts.premoveMap,from,sqName(i),this.opts.playerColor==='w',this.opts.premoveRights)) : this.chess.legalMovesFrom(nameToIdx(from)).map((m) => m.to);
     }
 
     _onDragOver(ev, name) {
