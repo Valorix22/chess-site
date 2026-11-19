@@ -20,6 +20,7 @@ class PublicSiteTest(unittest.TestCase):
             local=TestClient(server.app,base_url='http://127.0.0.1').get('/api/health')
             self.assertEqual(local.status_code,200)
             self.assertNotIn('strict-transport-security',local.headers)
+            self.assertEqual(local.headers['cache-control'],'no-store')
     def test_secure_cookie_and_login_through_tunnel(self):
         with patch.object(server,'PUBLIC_URL',PUBLIC),patch.dict(os.environ,{'COOKIE_SECURE':'1'}):
             c=TestClient(server.app,base_url=PUBLIC,client=('127.0.0.1',1234),headers={'X-Club':'1','X-Forwarded-Proto':'https','Origin':PUBLIC})

@@ -28,6 +28,7 @@ class BeginnerBotTest(unittest.TestCase):
         self.assertGreater(beginner_error_rate(200),beginner_error_rate(800))
         self.assertGreater(beginner_error_rate(800),beginner_error_rate(1310))
         self.assertEqual(beginner_error_rate(1320),0)
+        self.assertEqual(beginner_error_rate(2400),0)
 
     def test_check_promotion_and_forced_positions(self):
         rng=Mock()
